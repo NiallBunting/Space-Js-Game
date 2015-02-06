@@ -1,27 +1,27 @@
-var square;
-
 var canv;
 var ctx;
 
+var v1; 
+var v2;
+
 function start(){
-	//canvas set up
+	//canvas set up	
 	canv=document.getElementById("mycan");
-	ctx=mycan.getContext("2d");
+	ctx=mycan.getContext("2d");	
+	v1 = particle.create(10, 10, 999, 10);
+	v2 = particle.create(300, 300, 555, 1000);
 	requestAnimationFrame(paint);
-	square = {};
-	square.x = 10;
-	square.y = 10;
 }
 
 
 
 function paint(){
-	canv.width=canv.width;
-	ctx.fillStyle='#aaa';
-	ctx.fillRect(0,0,mycan.width,mycan.height);
-	ctx.fillStyle='#000';
-	ctx.fillRect(square.x, square.y, 40, 40);
-	//alert("paint");
+	ctx.clearRect(0, 0, canv.width, canv.height);
+	v1.gravity(v2);
+	v1.update(1);	
+	v2.update(1);
+	v1.draw();
+	v2.draw();
 	requestAnimationFrame(paint);
 }
 
@@ -45,25 +45,25 @@ document.onkeydown= function(event) {
   
     // left 
     case 37:
-      square.x--;
+      v1.addforce(-1, 0);
       break; 
 
     // up 
     case 38:
     // action when pressing up key
-      square.y--;
+      v1.addforce(0, -1);
       break; 
 
     // right 
     case 39:
     // action when pressing right key
-      square.x++;
+      v1.addforce(1, 0);
       break; 
 
     // down
     case 40:
     // action when pressing down key
-	square.y++;
+      v1.addforce(0, 1);
       break; 
 
     default: 
