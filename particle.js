@@ -1,22 +1,24 @@
 var particle = {
 
 	//The internal values, prefixed with a p_ (for private)
-        p_mass: 10,
+    p_mass: 10,
 	p_xforce: 0,
 	p_yforce: 0,
-        p_x: 200,
-        p_y: 200,
+    p_x: 200,
+    p_y: 200,
 	p_px: 200,
 	p_py: 200,
-        p_drawing: 0,
-	color: 0,
+    p_drawing: 0,
+	p_color: 0,
+	p_width: 10,
 
-        create: function (x, y, col, mass) {
+        create: function (x, y, col, mass, width) {
             var obj = Object.create(this);
 	    obj.setx(x);
 	    obj.sety(y);
-	    obj.color = col;
+	    obj.p_color = col;
 	    obj.setmass(mass);
+		obj.p_width = width;
             return obj;
         },
 
@@ -43,6 +45,10 @@ var particle = {
         setmass: function (value) {	
 	    this.p_mass = value;
         },
+		
+		getradius: function () {
+			return this.p_width;
+		},
 
 	update: function (time) {
 
@@ -65,6 +71,7 @@ var particle = {
 	},
 
 	gravity: function (obj) {
+		if(this.collided(obj)){return;}
 		var grav = 2;
 		var xdist = obj.getx() - this.getx();
 		var ydist = obj.gety() - this.gety();
@@ -80,11 +87,28 @@ var particle = {
 	},
 
 	draw: function () {
-		ctx.fillStyle= '#' + this.color;
-		ctx.fillRect(this.p_x,this.p_y,40,40);		
+		ctx.fillStyle= '#' + this.p_color;
+		ctx.beginPath();
+		ctx.arc(this.p_x, this.p_y, this.p_width, 0, 2 * Math.PI);
+		ctx.fill();
+	},
+	
+	collided: function (obj) {
+		var xdist = obj.getx() - this.getx();
+		var ydist = obj.gety() - this.gety();
+		var dist = Math.sqrt((xdist * xdist) + (ydist * ydist));
+		var radiustotal = this.getradius() + obj.getradius();
+		if(dist <= radiustotal){
+			this.p_x = this.p_px;
+			this.p_y = this.p_py;
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
-    };
+};
 
 
 
