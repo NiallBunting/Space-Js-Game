@@ -1,24 +1,21 @@
 var particle = {
 
 	//The internal values, prefixed with a p_ (for private)
-    p_mass: 10,
+   	p_mass: 10,
 	p_xforce: 0,
 	p_yforce: 0,
-    p_x: 200,
-    p_y: 200,
+   	p_x: 200,
+   	p_y: 200,
 	p_px: 200,
 	p_py: 200,
-    p_drawing: 0,
-	p_color: 0,
-	p_width: 10,
+	p_width: 0,
 
-        create: function (x, y, col, mass, width) {
+        create: function (x, y, mass, width) {
             var obj = Object.create(this);
 	    obj.setx(x);
 	    obj.sety(y);
-	    obj.p_color = col;
 	    obj.setmass(mass);
-		obj.p_width = width;
+	    obj.p_width = width;
             return obj;
         },
 
@@ -84,13 +81,6 @@ var particle = {
 	addforce: function (xforce, yforce) {
 		this.p_xforce += xforce;
 		this.p_yforce += yforce;
-	},
-
-	draw: function () {
-		ctx.fillStyle= '#' + this.p_color;
-		ctx.beginPath();
-		ctx.arc(this.p_x, this.p_y, this.p_width, 0, 2 * Math.PI);
-		ctx.fill();
 	},
 	
 	collided: function (obj) {

@@ -1,44 +1,47 @@
 var canv;
 var ctx;
 
-var v1; 
-var v2;
+var myship;
+var myplanet;
+
+var screen = {
+	x: 0,
+	y: 0
+};
 
 function start(){
 	//canvas set up	
 	canv=document.getElementById("mycan");
 	ctx=mycan.getContext("2d");	
-	v1 = ship.create();
-	v3 = particle.create(300, 40, 777, 10, 20);
-	v2 = particle.create(300, 300, 555, 350, 100);
-	v3.addforce(6, 0);
+	myship = ship.create();
+	myplanet = planet.create();
 	requestAnimationFrame(paint);
 }
 
 
 
 function paint(){
+	//clear
 	ctx.clearRect(0, 0, canv.width, canv.height);
-	v1.physical.gravity(v2);
-	//v2.gravity(v1);
-	v3.gravity(v2);	
-	v1.physical.collided(v2);
-	v1.physical.collided(v3);
-	v1.physical.update(1);	
-	v3.update(1);
-	
-	v3.draw();
-	v2.update(1);
-	v1.physical.draw();
-	v2.draw();
+	//gravity
+	myship.physical.gravity(myplanet.physical);
+	//collide
+	myship.physical.collided(myplanet.physical);
+	//update
+	myship.physical.update(1);	
+	//draw
+	myship.draw();
+	myplanet.draw();
 	requestAnimationFrame(paint);
 }
 
 
 // for multiple keys: http://stackoverflow.com/questions/5203407/javascript-multiple-keys-pressed-at-once
-document.onkeydown= function(event) {
+var keys = [];
+
+document.onkeydown = document.onkeyup = function(event) {
   var keyCode; 
-  
+
   if(event == null)
   {
     keyCode = window.event.keyCode; 
@@ -47,35 +50,26 @@ document.onkeydown= function(event) {
   {
     keyCode = event.keyCode; 
   }
-  console.log(keyCode);  
-  
-  switch(keyCode)
-  {
-  
-    // left 
-    case 37:
-      v1.physical.addforce(-1, 0);
-      break; 
 
-    // up 
-    case 38:
-    // action when pressing up key
-      v1.physical.addforce(0, -1);
-      break; 
+  keys[keyCode] = event.type == 'keydown';
 
-    // right 
-    case 39:
-    // action when pressing right key
-      v1.physical.addforce(1, 0);
-      break; 
+//left
+  if(keys[37] == true){
+	myship.physical.addforce(-1, 0);
+  }
 
-    // down
-    case 40:
-    // action when pressing down key
-      v1.physical.addforce(0, 1);
-      break; 
+//right
+  if(keys[38] == true){
+	myship.physical.addforce(0, -1);
+  }
 
-    default: 
-      break; 
-  } 
+//up
+  if(keys[39] == true){
+	myship.physical.addforce(1, 0);
+  }
+
+//down
+  if(keys[40] == true){
+	myship.physical.addforce(0, 1);
+  }
 }
