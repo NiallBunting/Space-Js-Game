@@ -4,10 +4,9 @@ var ctx;
 var myship;
 var myplanet;
 
-var screen = {
-	x: 0,
-	y: 0
-};
+var screen = {};
+screen.x = 100;
+screen.y = 100;
 
 function start(){
 	//canvas set up	

@@ -96,6 +96,12 @@ var particle = {
 		else{
 			return false;
 		}
+	},
+
+	getspeed: function () {
+		var xdist = this.p_px - this.getx();
+		var ydist = this.p_py - this.gety();
+		return Math.round(Math.sqrt((xdist * xdist) + (ydist * ydist)));
 	}
 
 };
