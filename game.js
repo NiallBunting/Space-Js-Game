@@ -54,21 +54,21 @@ document.onkeydown = document.onkeyup = function(event) {
 
 //left
   if(keys[37] == true){
-	myship.physical.addforce(-1, 0);
+	myship.left();
   }
 
 //right
-  if(keys[38] == true){
-	myship.physical.addforce(0, -1);
+  if(keys[39] == true){
+	myship.right();
   }
 
 //up
-  if(keys[39] == true){
-	myship.physical.addforce(1, 0);
+  if(keys[38] == true){
+	myship.up();
   }
 
 //down
   if(keys[40] == true){
-	myship.physical.addforce(0, 1);
+	myship.down();
   }
 }
