@@ -18,9 +18,6 @@ var ship = {
 		ctx.arc(canv.width/2, canv.height/2, this.physical.getradius(), 0, 2 * Math.PI);
 
 		//https://en.wikipedia.org/wiki/Circle#Equations
-		var testx = canv.width/2 + (this.physical.getradius() * Math.cos(this.direction));
-		var testy = canv.height/2 + (this.physical.getradius() * Math.sin(this.direction));
-		
 		ctx.moveTo(canv.width/2 + (this.physical.getradius() * Math.cos(this.direction)) , canv.height/2 + (this.physical.getradius() * Math.sin(this.direction)));
 		ctx.lineTo(canv.width/2 + (this.physical.getradius() * Math.cos(this.direction + 2.4)) , canv.height/2 + (this.physical.getradius() * Math.sin(this.direction + 2.4)));
 		ctx.lineTo(canv.width/2 + (this.physical.getradius() * Math.cos(this.direction + 3.8)) , canv.height/2 + (this.physical.getradius() * Math.sin(this.direction + 3.8)));
