@@ -20,6 +20,27 @@ function start(){
 
 
 function paint(){
+
+	//left
+	  if(keys[37] == true){
+		myship.left();
+	  }
+
+	//right
+	  if(keys[39] == true){
+		myship.right();
+	  }
+
+	//up
+	  if(keys[38] == true){
+		myship.up();
+	  }
+
+	//down
+	  if(keys[40] == true){
+		myship.down();
+	  }
+
 	//clear
 	ctx.clearRect(0, 0, canv.width, canv.height);
 	//gravity
@@ -50,25 +71,6 @@ document.onkeydown = document.onkeyup = function(event) {
     keyCode = event.keyCode; 
   }
 
-  keys[keyCode] = event.type == 'keydown';
+  keys[keyCode] = (event.type == 'keydown');
 
-//left
-  if(keys[37] == true){
-	myship.left();
-  }
-
-//right
-  if(keys[39] == true){
-	myship.right();
-  }
-
-//up
-  if(keys[38] == true){
-	myship.up();
-  }
-
-//down
-  if(keys[40] == true){
-	myship.down();
-  }
 }
