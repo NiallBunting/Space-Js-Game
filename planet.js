@@ -2,7 +2,7 @@ var planet = {
 
 	create: function(){
 		var obj = Object.create(this);
-		obj.physical = particle.create(1000, 1000, 8000, 1000);
+		obj.physical = particle.create(5000, 5000, 200000, 4000);
 		return obj;
 	},
 
