@@ -8,7 +8,6 @@ var particle = {
    	p_y: 200,
 	p_px: 200,
 	p_py: 200,
-	p_width: 0,
 
         create: function (x, y, mass, width) {
             var obj = Object.create(this);
@@ -47,8 +46,9 @@ var particle = {
 			return this.p_width;
 		},
 
+	//updated all the physics
 	update: function (time) {
-
+		
 		var accelx = this.p_xforce;
 		var accely = this.p_yforce;
 
@@ -64,9 +64,9 @@ var particle = {
 		this.p_py = this.p_y;
 		this.p_x = x;
 		this.p_y = y;
-
 	},
 
+	//calculates gravity on an a object
 	gravity: function (obj) {
 		if(this.collided(obj)){return;}
 		var grav = 2;
@@ -78,30 +78,49 @@ var particle = {
 		this.p_yforce += force * (ydist/dist);
 	},
 
+	//adds a force to an object
 	addforce: function (xforce, yforce) {
 		this.p_xforce += xforce;
 		this.p_yforce += yforce;
 	},
 	
+	//Checks if circles have collided
 	collided: function (obj) {
 		var xdist = obj.getx() - this.getx();
 		var ydist = obj.gety() - this.gety();
 		var dist = Math.sqrt((xdist * xdist) + (ydist * ydist));
 		var radiustotal = this.getradius() + obj.getradius();
 		if(dist <= radiustotal){
-			this.p_x = this.p_px;
-			this.p_y = this.p_py;
-			return true;
+			return radiustotal - dist;
 		}
 		else{
-			return false;
+			return 0;
 		}
 	},
 
+	//returns the distance traveled
 	getspeed: function () {
 		var xdist = this.p_px - this.getx();
 		var ydist = this.p_py - this.gety();
 		return Math.round(Math.sqrt((xdist * xdist) + (ydist * ydist)));
+	},
+	
+	//TODO
+	//adds some friction to be calcualted
+	applypush: function(frictionval, direction){
+		//should add a force in the wrong direction,
+		//takes in a percentage slowed down
+		var xdist = this.p_px - this.getx();
+		var ydist = this.p_py - this.gety();
+		
+		xdist *= frictionval;
+		ydist *= frictionval;
+		
+		if(frictionval == 1){
+			//need to stop things getting in eachother
+		}
+		
+		this.addforce(xdist, ydist);
 	}
 
 };

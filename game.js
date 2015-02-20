@@ -4,6 +4,9 @@ var ctx;
 var myship;
 var myplanet;
 
+var drawobjects = {};
+var updateobjects = {};
+
 var screen = {};
 screen.x = 100;
 screen.y = 100;
@@ -13,7 +16,7 @@ function start(){
 	canv=document.getElementById("mycan");
 	ctx=mycan.getContext("2d");	
 	myship = ship.create();
-	myplanet = planet.create();
+	myplanet = planet.create(5000, 5000, 200000, 4000);
 	requestAnimationFrame(paint);
 }
 
@@ -46,12 +49,18 @@ function paint(){
 	//gravity
 	myship.physical.gravity(myplanet.physical);
 	//collide
-	myship.physical.collided(myplanet.physical);
+	if(myship.physical.collided(myplanet.physical)){
+		myship.collided();
+	}
+	if(myship.physical.collided(myplanet.atmosphere.physical)){
+		myship.physical.applypush(0.02, 0);
+	}
 	//update
+	myship.update(1);
 	myship.physical.update(1);	
 	//draw
-	myship.draw();
 	myplanet.draw();
+	myship.draw();
 	requestAnimationFrame(paint);
 }
 
@@ -74,3 +83,14 @@ document.onkeydown = document.onkeyup = function(event) {
   keys[keyCode] = (event.type == 'keydown');
 
 }
+
+var minimap = {
+	update: function(){
+		//Gets the position all all the planets
+		// Should it show near people?
+	},
+	
+	draw: function() {
+		//Draws the box and everything with it
+	}
+};
