@@ -1,8 +1,15 @@
 html, body {
 	background:#cccccc;
+	margin:0px;
+	padding:0px;
+}
 
+nav {
+	height:2%;
 }
 
 canvas {
 	background:#ffffff;
+	width:100%;
+	height:98%;
 }

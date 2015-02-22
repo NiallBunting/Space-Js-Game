@@ -2,7 +2,7 @@ var ship = {
 
 	p_direction: 0,
 	// power forward, back, left, right
-	p_power: [0.29 , -0.01, -0.001, 0.001],
+	p_power: [3 , -0.01, -0.01, 0.01],
 	p_spin: 0,
 
 	create: function(){
@@ -12,12 +12,14 @@ var ship = {
 	},
 	
 	update: function(time){
-		this.p_direction += this.p_spin;
+		this.physical.update(time);
+	
+		this.p_direction += (this.p_spin * time);
 		
 		screen.x = -this.physical.getx()+ canv.width/2;
 		screen.y = -this.physical.gety() + canv.height/2;
 
-		document.getElementById("pos").innerHTML = "X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed();
+		console.log("X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed());
 	},
 
 	draw: function() {
@@ -52,12 +54,13 @@ var ship = {
 	
 	spin: function(right){
 		var spinner = right ? this.p_power[3] : this.p_power[2];
-		this.p_spin += spinner;
-		//Make 4.5 the highest.
+		this.p_spin += (spinner / this.physical.getmass());
+		if(this.p_spin > 4.5){this.p_spin = 4.5;}
+		if(this.p_spin < -4.5){this.p_spin = -4.5}
 	},
 	
 	forward: function(power){
-				this.physical.addforce(power * Math.cos(this.p_direction) , power * Math.sin(this.p_direction));
+		this.physical.addforce(power * Math.cos(this.p_direction) , power * Math.sin(this.p_direction));
 	},
 	
 	collided: function(){
@@ -67,8 +70,6 @@ var ship = {
 		}else{
 			//land
 		}
-		
-		this.physical.applypush(1, 0);
 	}
 
 };

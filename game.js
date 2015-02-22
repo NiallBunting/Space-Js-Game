@@ -1,22 +1,15 @@
-var canv;
-var ctx;
-
-var myship;
-var myplanet;
-
-var drawobjects = {};
-var updateobjects = {};
-
-var screen = {};
-screen.x = 100;
-screen.y = 100;
+var updateobjects = [];
 
 function start(){
 	//canvas set up	
 	canv=document.getElementById("mycan");
 	ctx=mycan.getContext("2d");	
-	myship = ship.create();
-	myplanet = planet.create(5000, 5000, 200000, 4000);
+	ctx.font="20px Georgia";
+	updateobjects[updateobjects.length] = ship.create();
+	updateobjects[updateobjects.length] = planet.create(100000, 100000, 200000000, 40000);
+	updateobjects[updateobjects.length] = planet.create(-100000, -100000, 200000000, 40000);
+	var d = new Date();
+	oldtime = d.getTime();
 	requestAnimationFrame(paint);
 }
 
@@ -26,47 +19,63 @@ function paint(){
 
 	//left
 	  if(keys[37] == true){
-		myship.left();
+		updateobjects[0].left();
 	  }
 
 	//right
 	  if(keys[39] == true){
-		myship.right();
+		updateobjects[0].right();
 	  }
 
 	//up
 	  if(keys[38] == true){
-		myship.up();
+		updateobjects[0].up();
 	  }
 
 	//down
 	  if(keys[40] == true){
-		myship.down();
+		updateobjects[0].down();
 	  }
 
-	//clear
+	//clear the screen
 	ctx.clearRect(0, 0, canv.width, canv.height);
-	//gravity
-	myship.physical.gravity(myplanet.physical);
-	//collide
-	if(myship.physical.collided(myplanet.physical)){
-		myship.collided();
+	//gravity and collisions
+	for(i = 0; i < updateobjects.length; i++) {
+		for(j = 0; j < updateobjects.length; j++) {
+    			if(i == j){continue;}
+			updateobjects[i].physical.gravity(updateobjects[j].physical);
+			updateobjects[i].physical.collided(updateobjects[j].physical);
+		}
 	}
-	if(myship.physical.collided(myplanet.atmosphere.physical)){
-		myship.physical.applypush(0.02, 0);
+
+
+	var d = new Date();
+	var newtime = d.getTime();
+	var updatetime = (newtime - oldtime)/100;
+	updatetime = (updatetime > MAX_TIME_OUT) ? MAX_TIME_OUT : updatetime;
+
+	//Update all the objects
+	for(i = 0; i < updateobjects.length; i++) {
+		updateobjects[i].update(updatetime);
 	}
-	//update
-	myship.update(1);
-	myship.physical.update(1);	
-	//draw
-	myplanet.draw();
-	myship.draw();
+
+	oldtime = newtime;
+
+	//Draw all the objects
+	for(i = updateobjects.length - 1; i >= 0; i--) {
+		updateobjects[i].draw();
+	}
+	map.line(updateobjects[2]);
+	
+	//Toggles map, if pressed
+	map.draw();
+	
 	requestAnimationFrame(paint);
+
 }
 
 
 // for multiple keys: http://stackoverflow.com/questions/5203407/javascript-multiple-keys-pressed-at-once
-var keys = [];
 
 document.onkeydown = document.onkeyup = function(event) {
   var keyCode; 
@@ -82,15 +91,68 @@ document.onkeydown = document.onkeyup = function(event) {
 
   keys[keyCode] = (event.type == 'keydown');
 
+
 }
 
-var minimap = {
-	update: function(){
-		//Gets the position all all the planets
-		// Should it show near people?
+var map = {
+	p_screenx:0,
+	p_screeny:0,
+	p_factor:1000,
+	p_previouspress: 0,
+	p_open:0,
+
+	pressed: function() {
+		if(keys[77] == true && this.p_previouspress == 0){
+			this.p_open = (this.p_open == 1) ? 0 : 1;
+			this.p_previouspress = 1;
+		}
+		if(keys[77] == false){
+			this.p_previouspress = 0;
+		}
+
+		return this.p_open;
 	},
-	
+
 	draw: function() {
-		//Draws the box and everything with it
+		//dont draw anything if map open is 0
+		if(!this.pressed()){return;}
+
+		this.p_screenx = screen.x;
+		this.p_screeny = screen.y;
+		ctx.clearRect(0, 0, canv.width, canv.height);
+		ctx.fillText("Map.",50,50);
+		ctx.scale(1/this.p_factor, 1/this.p_factor);
+
+		screen.x = (canv.width*this.p_factor)/2;
+		screen.y = (canv.height*this.p_factor)/2;
+
+		ctx.fillStyle= '#' + '900';
+		ctx.beginPath();
+		ctx.arc(updateobjects[0].physical.getx() + screen.x, updateobjects[0].physical.gety() + screen.y, 3000, 0, 2 * Math.PI);
+		ctx.fill();
+
+		for(i = updateobjects.length - 1; i >= 0; i--) {
+			updateobjects[i].draw();
+		}
+		ctx.scale(this.p_factor, this.p_factor);
+
+		screen.x = this.p_screenx;
+		screen.y = this.p_screeny;
+		
+	},
+
+	ismapopen: function() {
+		return this.p_open;
+	},
+
+	line: function(obj) {
+		ctx.beginPath();
+      		ctx.moveTo(updateobjects[0].physical.getx()+ screen.x, updateobjects[0].physical.gety()+ screen.y);
+      		ctx.lineTo(obj.physical.getx()+ screen.x, obj.physical.gety()+ screen.y);
+      		ctx.stroke();
+		var xdist = updateobjects[0].physical.getx() - obj.physical.getx();
+		var ydist = updateobjects[0].physical.gety() - obj.physical.gety();
+		var dist =  Math.round(Math.sqrt((xdist * xdist)+(ydist * ydist)) - obj.physical.getradius());
+		ctx.fillText("Distance: " + dist,50,50);
 	}
 };

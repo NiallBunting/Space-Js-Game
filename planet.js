@@ -13,6 +13,10 @@ var planet = {
 		ctx.beginPath();
 		ctx.arc(this.physical.getx() + screen.x, this.physical.gety() + screen.y, this.physical.getradius(), 0, 2 * Math.PI);
 		ctx.fill();
+	},
+
+	update: function (time) {
+		this.physical.update(time);
 	}
 
 
@@ -27,15 +31,16 @@ var atmosphere = {
 	
 	create: function(radius){
 		var obj = Object.create(this);
-		obj.physical = particle.create(0, 0, 0, radius);
+		obj.physical = particle.create(0, 0, 200, radius);
 		obj.p_radius = radius;
+		obj.physical.setdensity(0.01);
 		return obj;
 	},
 	
 	draw: function(x, y){
 		this.physical.setx(x);
 		this.physical.sety(y);
-		ctx.fillStyle= '#' + 'ccc';
+		ctx.fillStyle= "rgba(200, 200, 200, 0.5)";
 		ctx.beginPath();
 		ctx.arc(this.physical.getx() + screen.x, this.physical.gety() + screen.y, this.physical.getradius(), 0, 2 * Math.PI);
 		ctx.fill();
