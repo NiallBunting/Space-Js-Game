@@ -150,6 +150,20 @@ var particle = {
 
 	setspeedtorevolve: function(obj) {
 
+	},
+	
+	clone: function() {
+        var obj = Object.create(this);
+		obj.p_mass = this.p_mass;
+		obj.p_xforce = this.p_xforce;
+		obj.p_yforce = this.p_yforce;
+		obj.p_x = this.p_x;
+		obj.p_y = this.p_y;
+		obj.p_px = this.p_px;
+		obj.p_py = this.p_py;
+		obj.p_density = this.p_density;
+		obj.p_width = this.p_width;
+		return obj;
 	}
 };
 

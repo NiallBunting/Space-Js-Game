@@ -8,8 +8,9 @@ function start(){
 	updateobjects[updateobjects.length] = ship.create();
 	updateobjects[updateobjects.length] = planet.create(0, 0, 20000000000, 40000);
 	//updateobjects[updateobjects.length] = planet.create(100000, 100000, 2000000, 30000);
-	var myforce = 1224 * updateobjects[0].physical.getmass();
+	var myforce = 1700;
 	updateobjects[0].physical.addforce(myforce, 0);
+	updateobjects[0].update(1);
 	var d = new Date();
 	oldtime = d.getTime();
 	requestAnimationFrame(paint);
@@ -128,8 +129,8 @@ var map = {
 	p_offsety: 0,
 
 	pressed: function() {
-		if(keys[77] == true && this.p_previouspress == 0){
-			if(this.p_open == 1){
+		if(keys[77] == true && this.p_previouspress === 0){
+			if(this.p_open === 1){
 				this.p_open = 0; 
 				this.p_offsetx = this.p_offsety = 0;
 				this.p_factor = 3000;
@@ -172,12 +173,40 @@ var map = {
 		for(i = updateobjects.length - 1; i >= 0; i--) {
 			updateobjects[i].draw();
 		}
+		
+		this.estimatedpath(0);
+		
 		ctx.scale(this.p_factor, this.p_factor);
 
 		//put the offset back
 		screen.x = this.p_screenx;
 		screen.y = this.p_screeny;
 		
+	},
+	
+	//To draw the path the object will take
+	estimatedpath: function (objnum) {
+		var estimateobj = updateobjects[objnum].physical.clone();
+		
+		//estimateobj.update(0.01);
+		
+		for(i = 100; i < 500; i++){
+			for(j = 0; j < updateobjects.length; j++) {
+    			if(j === objnum){continue;}
+				estimateobj.gravity(updateobjects[j].physical);
+			}
+			
+			estimateobj.update(1);
+			
+			ctx.strokeStyle= '#' + i;
+			ctx.beginPath();
+				ctx.arc(estimateobj.getx() + screen.x, estimateobj.gety() + screen.y, (3 * 1000), 0, 2 * Math.PI);
+				//ctx.lineWidth = 1500;
+				//ctx.moveTo(estimateobj.getx() + screen.x, estimateobj.gety() + screen.y);
+				//ctx.lineTo(0 + screen.x, 0 + screen.y);
+				//console.log(estimateobj.p_py + screen.y + " " + estimateobj.gety() + screen.y);
+			ctx.fill();
+		}
 	},
 
 	left: function () {

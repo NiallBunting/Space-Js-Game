@@ -19,7 +19,7 @@ var ship = {
 		screen.x = -this.physical.getx()+ canv.width/2;
 		screen.y = -this.physical.gety() + canv.height/2;
 		
-		console.log("X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed());
+		//console.log("X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed());
 		
 	},
 
