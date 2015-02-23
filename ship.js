@@ -2,12 +2,12 @@ var ship = {
 
 	p_direction: 0,
 	// power forward, back, left, right
-	p_power: [3 , -0.01, -0.01, 0.01],
+	p_power: [10 , -3, -0.01, 0.01],
 	p_spin: 0,
 
 	create: function(){
 		var obj = Object.create(this);
-		obj.physical = particle.create(30, 30, 10, 10);
+		obj.physical = particle.create(0, 120000, 10, 10);
 		return obj;
 	},
 	
@@ -19,9 +19,8 @@ var ship = {
 		screen.x = -this.physical.getx()+ canv.width/2;
 		screen.y = -this.physical.gety() + canv.height/2;
 		
-		if(debugoff == 1){
 		console.log("X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed());
-		}
+		
 	},
 
 	draw: function() {

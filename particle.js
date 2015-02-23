@@ -78,7 +78,6 @@ var particle = {
 
 	//calculates gravity on an a object
 	gravity: function (obj) {
-		var grav = 2;
 		var xdist = obj.getx() - this.getx();
 		var ydist = obj.gety() - this.gety();
 		var dist = Math.sqrt((xdist * xdist) + (ydist * ydist));
@@ -92,7 +91,7 @@ var particle = {
 		var xdist = obj.getx() - this.getx();
 		var ydist = obj.gety() - this.gety();
 		var dist = Math.sqrt((xdist * xdist) + (ydist * ydist));
-		var force = (grav * this.getmass() * obj.getmass()) / (dist * dist);
+		var force = ((grav * 3) * this.getmass() * obj.getmass()) / (dist * dist);
 		this.p_xforce -= force * (xdist/dist);
 		this.p_yforce -= force * (ydist/dist);
 	},
@@ -138,9 +137,7 @@ var particle = {
 
 	//returns the distance traveled
 	getspeed: function () {
-		var xdist = this.p_px - this.getx();
-		var ydist = this.p_py - this.gety();
-		return Math.sqrt((xdist * xdist) + (ydist * ydist));
+		return calculate_distance(this.p_px, this.getx(), this.p_py, this.gety());
 	},
 
 	getxspeed: function () {
@@ -149,6 +146,10 @@ var particle = {
 
 	getyspeed: function () {
 		return this.p_py - this.gety();
+	},
+
+	setspeedtorevolve: function(obj) {
+
 	}
 };
 

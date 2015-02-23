@@ -6,8 +6,10 @@ function start(){
 	ctx=mycan.getContext("2d");	
 	ctx.font="20px Georgia";
 	updateobjects[updateobjects.length] = ship.create();
-	updateobjects[updateobjects.length] = planet.create(100000, 100000, 200000000, 40000);
-	updateobjects[updateobjects.length] = planet.create(-100000, -100000, 200000000, 40000);
+	updateobjects[updateobjects.length] = planet.create(0, 0, 20000000000, 40000);
+	//updateobjects[updateobjects.length] = planet.create(100000, 100000, 2000000, 30000);
+	var myforce = 1224 * updateobjects[0].physical.getmass();
+	updateobjects[0].physical.addforce(myforce, 0);
 	var d = new Date();
 	oldtime = d.getTime();
 	requestAnimationFrame(paint);
@@ -69,7 +71,7 @@ function paint(){
 	for(i = updateobjects.length - 1; i >= 0; i--) {
 		updateobjects[i].draw();
 	}
-	map.line(updateobjects[2]);
+	map.line(updateobjects[1]);
 	
 	//Toggles map, if pressed
 	map.draw();
@@ -113,7 +115,7 @@ document.onmousewheel = function(event) {
 }
 
 document.onmousemove = function(event) {
-	console.log(event);
+	//console.log(event);
 }
 
 var map = {
