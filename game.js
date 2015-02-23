@@ -19,22 +19,26 @@ function paint(){
 
 	//left
 	  if(keys[37] == true){
-		updateobjects[0].left();
+		if(map.ismapopen()){map.left();}
+		else{updateobjects[0].left();}
 	  }
 
 	//right
 	  if(keys[39] == true){
-		updateobjects[0].right();
+		if(map.ismapopen()){map.right();}
+		else{updateobjects[0].right();}
 	  }
 
 	//up
 	  if(keys[38] == true){
-		updateobjects[0].up();
+		if(map.ismapopen()){map.up();}
+		else{updateobjects[0].up();}
 	  }
 
 	//down
 	  if(keys[40] == true){
-		updateobjects[0].down();
+		if(map.ismapopen()){map.down();}
+		else{updateobjects[0].down();}
 	  }
 
 	//clear the screen
@@ -44,7 +48,7 @@ function paint(){
 		for(j = 0; j < updateobjects.length; j++) {
     			if(i == j){continue;}
 			updateobjects[i].physical.gravity(updateobjects[j].physical);
-			updateobjects[i].physical.collided(updateobjects[j].physical);
+			updateobjects[i].collided(updateobjects[j].physical);
 		}
 	}
 
@@ -94,16 +98,42 @@ document.onkeydown = document.onkeyup = function(event) {
 
 }
 
+document.onmousewheel = function(event) {
+	if(map.ismapopen()){
+		//up	
+		if(event.deltaY < 0){
+			map.mousewheelin();
+		}
+
+		//down	
+		if(event.deltaY > 0){
+			map.mousewheelout();
+		}
+	}
+}
+
+document.onmousemove = function(event) {
+	console.log(event);
+}
+
 var map = {
 	p_screenx:0,
 	p_screeny:0,
-	p_factor:1000,
+	p_factor:3000,
 	p_previouspress: 0,
 	p_open:0,
+	p_offsetx: 0,
+	p_offsety: 0,
 
 	pressed: function() {
 		if(keys[77] == true && this.p_previouspress == 0){
-			this.p_open = (this.p_open == 1) ? 0 : 1;
+			if(this.p_open == 1){
+				this.p_open = 0; 
+				this.p_offsetx = this.p_offsety = 0;
+				this.p_factor = 3000;
+			}else{
+				this.p_open = 1;
+			}
 			this.p_previouspress = 1;
 		}
 		if(keys[77] == false){
@@ -116,19 +146,25 @@ var map = {
 	draw: function() {
 		//dont draw anything if map open is 0
 		if(!this.pressed()){return;}
-
+		
+		//remember the previous screen
 		this.p_screenx = screen.x;
 		this.p_screeny = screen.y;
+
+		//draw the title
 		ctx.clearRect(0, 0, canv.width, canv.height);
 		ctx.fillText("Map.",50,50);
+		//scale out
 		ctx.scale(1/this.p_factor, 1/this.p_factor);
 
-		screen.x = (canv.width*this.p_factor)/2;
-		screen.y = (canv.height*this.p_factor)/2;
+		//setup the screen x and y with offset
+		screen.x = (canv.width*this.p_factor)/2 + this.p_offsetx;
+		screen.y = (canv.height*this.p_factor)/2 + this.p_offsety;
 
+		//draw the planets
 		ctx.fillStyle= '#' + '900';
 		ctx.beginPath();
-		ctx.arc(updateobjects[0].physical.getx() + screen.x, updateobjects[0].physical.gety() + screen.y, 3000, 0, 2 * Math.PI);
+		ctx.arc(updateobjects[0].physical.getx() + screen.x, updateobjects[0].physical.gety() + screen.y, (3 * this.p_factor), 0, 2 * Math.PI);
 		ctx.fill();
 
 		for(i = updateobjects.length - 1; i >= 0; i--) {
@@ -136,9 +172,36 @@ var map = {
 		}
 		ctx.scale(this.p_factor, this.p_factor);
 
+		//put the offset back
 		screen.x = this.p_screenx;
 		screen.y = this.p_screeny;
 		
+	},
+
+	left: function () {
+		this.p_offsetx += this.p_factor * 2;
+	},
+
+	right: function () {
+		this.p_offsetx -= this.p_factor * 2;
+	},
+
+	up: function () {
+		this.p_offsety += this.p_factor * 2;
+	},
+
+	down: function () {
+		this.p_offsety -= this.p_factor * 2;
+	},
+
+	mousewheelin: function () {
+		this.p_factor -= 100;
+		if(this.p_factor < 200){this.p_factor = 200;}
+	},
+
+	mousewheelout: function () {
+		this.p_factor += 100;
+		if(this.p_factor > 10000){this.p_factor = 10000;}
 	},
 
 	ismapopen: function() {
@@ -146,13 +209,21 @@ var map = {
 	},
 
 	line: function(obj) {
+		ctx.strokeStyle= '#' + '000';
+		ctx.lineWidth = 1;
 		ctx.beginPath();
       		ctx.moveTo(updateobjects[0].physical.getx()+ screen.x, updateobjects[0].physical.gety()+ screen.y);
       		ctx.lineTo(obj.physical.getx()+ screen.x, obj.physical.gety()+ screen.y);
-      		ctx.stroke();
-		var xdist = updateobjects[0].physical.getx() - obj.physical.getx();
-		var ydist = updateobjects[0].physical.gety() - obj.physical.gety();
-		var dist =  Math.round(Math.sqrt((xdist * xdist)+(ydist * ydist)) - obj.physical.getradius());
+		ctx.stroke();
+		var dist =  Math.round(calculate_distance(updateobjects[0].physical.getx(), obj.physical.getx(), 
+			updateobjects[0].physical.gety(), obj.physical.gety()) - obj.physical.getradius());
 		ctx.fillText("Distance: " + dist,50,50);
 	}
 };
+
+//Helper Functions
+function calculate_distance(x1 , x2, y1, y2) {
+		var xdist = x1 - x2;
+		var ydist = y1 - y2;
+		return Math.sqrt((xdist * xdist)+(ydist * ydist));
+}

@@ -103,14 +103,20 @@ var particle = {
 		this.p_xforce += xforce;
 		this.p_yforce += yforce;
 	},
+
+	havecollided: function (obj){
+		var dist = calculate_distance(obj.getx(), this.getx(), obj.gety(), this.gety());
+		var radiustotal = this.getradius() + obj.getradius();
+		if(dist < radiustotal){
+			return true;
+		}else{
+			return false;
+		}
+	},
 	
 	//Checks if circles have collided, then applys the force
 	collided: function (obj) {
-		var xdist = obj.getx() - this.getx();
-		var ydist = obj.gety() - this.gety();
-		var dist = Math.sqrt((xdist * xdist) + (ydist * ydist));
-		var radiustotal = this.getradius() + obj.getradius();
-		if(dist < radiustotal){
+		if(this.havecollided(obj)){
 			//negates gravity (pushes up from the ground) 
 			this.floorpush(obj);
 			//calculates the push in the x direction

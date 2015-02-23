@@ -14,5 +14,7 @@ screen.y = 100;
 
 var oldtime;
 
+var debugoff = 0;
+
 //keys pressed down
 var keys = [];

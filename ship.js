@@ -18,8 +18,10 @@ var ship = {
 		
 		screen.x = -this.physical.getx()+ canv.width/2;
 		screen.y = -this.physical.gety() + canv.height/2;
-
+		
+		if(debugoff == 1){
 		console.log("X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed());
+		}
 	},
 
 	draw: function() {
@@ -63,13 +65,14 @@ var ship = {
 		this.physical.addforce(power * Math.cos(this.p_direction) , power * Math.sin(this.p_direction));
 	},
 	
-	collided: function(){
+	collided: function(obj){
+		this.physical.collided(obj);
 		//ATTENTION, this does not allow fast movemment on planet
-		if(this.physical.getspeed() > 10){
+		//if(this.physical.getspeed() > 10){
 			//destroy
-		}else{
+		//}else{
 			//land
-		}
+		//}
 	}
 
 };

@@ -17,6 +17,10 @@ var planet = {
 
 	update: function (time) {
 		this.physical.update(time);
+	},
+
+	collided: function(obj){
+		this.physical.collided(obj);
 	}
 
 
