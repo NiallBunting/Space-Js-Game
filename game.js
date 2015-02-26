@@ -6,20 +6,49 @@ function start(){
 	ctx=mycan.getContext("2d");	
 	ctx.font="20px Georgia";
 	updateobjects[updateobjects.length] = ship.create();
-	updateobjects[updateobjects.length] = planet.create(0, 0, 20000000000, 40000);
-	//updateobjects[updateobjects.length] = planet.create(100000, 100000, 2000000, 30000);
-	var myforce = 1700;
-	updateobjects[0].physical.addforce(myforce, 0);
-	updateobjects[0].update(1);
+	createplanets();
 	var d = new Date();
 	oldtime = d.getTime();
 	requestAnimationFrame(paint);
 }
 
+function createplanets(){
+		updateobjects[updateobjects.length] = planet.create(0, 0, 20000000000, 40000, 'FFFF00');		
+		updateobjects[updateobjects.length] = planet.create(0, 3000000, 370000000, 24000, '787878');
+		updateobjects[updateobjects.length] = planet.create(0, 8321000, 470000000, 27000, 'CC0000');
+		updateobjects[updateobjects.length] = planet.create(0, 17530000, 120000000, 12000, '00CC00');
+		updateobjects[updateobjects.length] = planet.create(0, 12721000, 700000000, 30000, 'CC3300');
+		updateobjects[updateobjects.length] = planet.create(0, 14942000, 410000000, 36000, '787878');		
+		updateobjects[updateobjects.length] = planet.create(0, 18900000, 120000000, 13000, '0066FF');
+}
+
+function update(){
+
+	var d = new Date();
+	var newtime = d.getTime();
+	var updatetime = (newtime - oldtime)/100;
+	updatetime = (updatetime > MAX_TIME_OUT) ? MAX_TIME_OUT : updatetime;
+
+	//gravity and collisions
+	for(i = 0; i < updateobjects.length; i++) {
+		for(j = 0; j < updateobjects.length; j++) {
+    			if(i == j){continue;}
+			updateobjects[i].physical.gravity(updateobjects[j].physical, updatetime);
+			updateobjects[i].collided(updateobjects[j].physical, updatetime);
+		}
+	}
+
+	//Update all the objects
+	for(i = 0; i < updateobjects.length; i++) {
+		updateobjects[i].update(updatetime);
+	}
+
+	oldtime = newtime;
+}
+
 
 
 function paint(){
-
 	//left
 	  if(keys[37] == true){
 		if(map.ismapopen()){map.left();}
@@ -44,39 +73,22 @@ function paint(){
 		else{updateobjects[0].down();}
 	  }
 
+
+	//Toggles map, if pressed
+	if(map.draw() != false){requestAnimationFrame(paint); return;}
+
+	update();
+
 	//clear the screen
 	ctx.clearRect(0, 0, canv.width, canv.height);
-	//gravity and collisions
-	for(i = 0; i < updateobjects.length; i++) {
-		for(j = 0; j < updateobjects.length; j++) {
-    			if(i == j){continue;}
-			updateobjects[i].physical.gravity(updateobjects[j].physical);
-			updateobjects[i].collided(updateobjects[j].physical);
-		}
-	}
-
-
-	var d = new Date();
-	var newtime = d.getTime();
-	var updatetime = (newtime - oldtime)/100;
-	updatetime = (updatetime > MAX_TIME_OUT) ? MAX_TIME_OUT : updatetime;
-
-	//Update all the objects
-	for(i = 0; i < updateobjects.length; i++) {
-		updateobjects[i].update(updatetime);
-	}
-
-	oldtime = newtime;
 
 	//Draw all the objects
 	for(i = updateobjects.length - 1; i >= 0; i--) {
 		updateobjects[i].draw();
 	}
-	map.line(updateobjects[1]);
+	map.line(updateobjects[3]);
 	
-	//Toggles map, if pressed
-	map.draw();
-	
+
 	requestAnimationFrame(paint);
 
 }
@@ -148,7 +160,7 @@ var map = {
 
 	draw: function() {
 		//dont draw anything if map open is 0
-		if(!this.pressed()){return;}
+		if(!this.pressed()){return false;}
 		
 		//remember the previous screen
 		this.p_screenx = screen.x;
@@ -174,8 +186,6 @@ var map = {
 			updateobjects[i].draw();
 		}
 		
-		this.estimatedpath(0);
-		
 		ctx.scale(this.p_factor, this.p_factor);
 
 		//put the offset back
@@ -184,45 +194,20 @@ var map = {
 		
 	},
 	
-	//To draw the path the object will take
-	estimatedpath: function (objnum) {
-		var estimateobj = updateobjects[objnum].physical.clone();
-		
-		//estimateobj.update(0.01);
-		
-		for(i = 100; i < 500; i++){
-			for(j = 0; j < updateobjects.length; j++) {
-    			if(j === objnum){continue;}
-				estimateobj.gravity(updateobjects[j].physical);
-			}
-			
-			estimateobj.update(1);
-			
-			ctx.strokeStyle= '#' + i;
-			ctx.beginPath();
-				ctx.arc(estimateobj.getx() + screen.x, estimateobj.gety() + screen.y, (3 * 1000), 0, 2 * Math.PI);
-				//ctx.lineWidth = 1500;
-				//ctx.moveTo(estimateobj.getx() + screen.x, estimateobj.gety() + screen.y);
-				//ctx.lineTo(0 + screen.x, 0 + screen.y);
-				//console.log(estimateobj.p_py + screen.y + " " + estimateobj.gety() + screen.y);
-			ctx.fill();
-		}
-	},
-
 	left: function () {
-		this.p_offsetx += this.p_factor * 2;
+		this.p_offsetx += this.p_factor * 10;
 	},
 
 	right: function () {
-		this.p_offsetx -= this.p_factor * 2;
+		this.p_offsetx -= this.p_factor * 10;
 	},
 
 	up: function () {
-		this.p_offsety += this.p_factor * 2;
+		this.p_offsety += this.p_factor * 10;
 	},
 
 	down: function () {
-		this.p_offsety -= this.p_factor * 2;
+		this.p_offsety -= this.p_factor * 10;
 	},
 
 	mousewheelin: function () {
@@ -232,7 +217,7 @@ var map = {
 
 	mousewheelout: function () {
 		this.p_factor += 100;
-		if(this.p_factor > 10000){this.p_factor = 10000;}
+		if(this.p_factor > 10000000){this.p_factor = 10000000;}
 	},
 
 	ismapopen: function() {

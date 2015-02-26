@@ -1,15 +1,18 @@
 var planet = {
 
-	create: function(x, y, mass, width){
+	colour: 999,
+
+	create: function(x, y, mass, width, colour){
 		var obj = Object.create(this);
 		obj.physical = particle.create(x, y, mass, width);
 		obj.atmosphere = atmosphere.create(width + 1000);
+		obj.colour = colour;
 		return obj;
 	},
 
 	draw: function () {
 		this.atmosphere.draw(this.physical.getx(), this.physical.gety());
-		ctx.fillStyle= '#' + '999';
+		ctx.fillStyle= '#' + this.colour;
 		ctx.beginPath();
 		ctx.arc(this.physical.getx() + screen.x, this.physical.gety() + screen.y, this.physical.getradius(), 0, 2 * Math.PI);
 		ctx.fill();

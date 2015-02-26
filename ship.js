@@ -7,7 +7,7 @@ var ship = {
 
 	create: function(){
 		var obj = Object.create(this);
-		obj.physical = particle.create(0, 120000, 10, 10);
+		obj.physical = particle.create(0, 12000000, 10, 10);
 		return obj;
 	},
 	
@@ -19,7 +19,7 @@ var ship = {
 		screen.x = -this.physical.getx()+ canv.width/2;
 		screen.y = -this.physical.gety() + canv.height/2;
 		
-		//console.log("X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed());
+		console.log("X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed());
 		
 	},
 

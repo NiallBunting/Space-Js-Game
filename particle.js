@@ -77,13 +77,13 @@ var particle = {
 	},
 
 	//calculates gravity on an a object
-	gravity: function (obj) {
+	gravity: function (obj, time) {
 		var xdist = obj.getx() - this.getx();
 		var ydist = obj.gety() - this.gety();
 		var dist = Math.sqrt((xdist * xdist) + (ydist * ydist));
 		var force = (grav * this.getmass() * obj.getmass()) / (dist * dist);
-		this.p_xforce += force * (xdist/dist);
-		this.p_yforce += force * (ydist/dist);
+		this.p_xforce += force * (xdist/dist) * time;
+		this.p_yforce += force * (ydist/dist) * time;
 	},
 
 	//calculates gravity and negates it on an a object
@@ -114,7 +114,7 @@ var particle = {
 	},
 	
 	//Checks if circles have collided, then applys the force
-	collided: function (obj) {
+	collided: function (obj, time) {
 		if(this.havecollided(obj)){
 			//negates gravity (pushes up from the ground) 
 			this.floorpush(obj);
