@@ -7,7 +7,8 @@ var ship = {
 
 	create: function(){
 		var obj = Object.create(this);
-		obj.physical = particle.create(0, 12000000, 10, 10);
+		 //12680000
+		obj.physical = particle.create(0, 12780000, 10, 10);
 		return obj;
 	},
 	

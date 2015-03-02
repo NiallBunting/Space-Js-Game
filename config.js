@@ -2,7 +2,7 @@
 var grav = 6;
 
 //The max the game will jump on an update cycle
-var MAX_TIME_OUT = 1;
+var MAX_TIME_OUT = 0.3;
 
 //Global Varibles
 var canv;
@@ -16,3 +16,10 @@ var oldtime;
 
 //keys pressed down
 var keys = [];
+
+var mouseplace = {};
+mouseplace.x = 0;
+mouseplace.y = 0;
+
+//Testvalue
+var test = 1;

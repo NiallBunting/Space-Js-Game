@@ -77,25 +77,14 @@ var particle = {
 	},
 
 	//calculates gravity on an a object
-	gravity: function (obj, time) {
+	gravity: function (obj, time, positive) {
 		var xdist = obj.getx() - this.getx();
 		var ydist = obj.gety() - this.gety();
 		var dist = Math.sqrt((xdist * xdist) + (ydist * ydist));
 		var force = (grav * this.getmass() * obj.getmass()) / (dist * dist);
-		this.p_xforce += force * (xdist/dist) * time;
-		this.p_yforce += force * (ydist/dist) * time;
+		this.p_xforce += positive * force * (xdist/dist) * time;
+		this.p_yforce += positive * force * (ydist/dist) * time;
 	},
-
-	//calculates gravity and negates it on an a object
-	floorpush: function (obj) {
-		var xdist = obj.getx() - this.getx();
-		var ydist = obj.gety() - this.gety();
-		var dist = Math.sqrt((xdist * xdist) + (ydist * ydist));
-		var force = ((grav * 3) * this.getmass() * obj.getmass()) / (dist * dist);
-		this.p_xforce -= force * (xdist/dist);
-		this.p_yforce -= force * (ydist/dist);
-	},
-
 
 	//adds a force to an object
 	addforce: function (xforce, yforce) {
@@ -113,21 +102,23 @@ var particle = {
 		}
 	},
 	
+	setvelocity: function (x, y) {
+		this.p_px = this.p_x + x;
+		this.p_py = this.p_y + y;
+	},
+	
 	//Checks if circles have collided, then applys the force
 	collided: function (obj, time) {
 		if(this.havecollided(obj)){
 			//negates gravity (pushes up from the ground) 
-			this.floorpush(obj);
+			this.gravity(obj, 1 , -1);
 			//calculates the push in the x direction
 			var velocitytotalx = ((this.getxspeed() * this.getmass()) + (obj.getxspeed() * obj.getmass())) / (this.getmass() + obj.getmass());
-			var forcex = (this.getmass() * velocitytotalx) - (this.getmass() * this.getxspeed());
 			//calculates the push in the y direction
 			var velocitytotaly = ((this.getyspeed() * this.getmass()) + (obj.getyspeed() * obj.getmass())) / (this.getmass() + obj.getmass());
-			var forcey = (this.getmass() * velocitytotaly) - (this.getmass() * this.getyspeed());
-			//forcex *= obj.getdensity();
-			//forcey *= obj.getdensity();
+			
 			//adds the force
-			this.addforce(-forcex, -forcey);
+			this.setvelocity(velocitytotalx, velocitytotaly);
 			return true;
 		}
 		else{

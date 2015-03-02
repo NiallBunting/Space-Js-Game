@@ -1,4 +1,5 @@
 var updateobjects = [];
+var playerui;
 
 function start(){
 	//canvas set up	
@@ -6,20 +7,29 @@ function start(){
 	ctx=mycan.getContext("2d");	
 	ctx.font="20px Georgia";
 	updateobjects[updateobjects.length] = ship.create();
+	playerui = playerdisplay.create();
 	createplanets();
 	var d = new Date();
-	oldtime = d.getTime();
+	oldtime = d.getTime();  
+	window.addEventListener('resize', resizeCanvas, false);
+	resizeCanvas();
 	requestAnimationFrame(paint);
 }
 
+//http://stackoverflow.com/questions/4288253/html5-canvas-100-width-height-of-viewport
+    function resizeCanvas() {
+            canv.width = window.innerWidth;
+            canv.height = window.innerHeight;
+    }
+    
 function createplanets(){
-		updateobjects[updateobjects.length] = planet.create(0, 0, 20000000000, 40000, 'FFFF00');		
-		updateobjects[updateobjects.length] = planet.create(0, 3000000, 370000000, 24000, '787878');
-		updateobjects[updateobjects.length] = planet.create(0, 8321000, 470000000, 27000, 'CC0000');
-		updateobjects[updateobjects.length] = planet.create(0, 17530000, 120000000, 12000, '00CC00');
-		updateobjects[updateobjects.length] = planet.create(0, 12721000, 700000000, 30000, 'CC3300');
-		updateobjects[updateobjects.length] = planet.create(0, 14942000, 410000000, 36000, '787878');		
-		updateobjects[updateobjects.length] = planet.create(0, 18900000, 120000000, 13000, '0066FF');
+		updateobjects[updateobjects.length] = planet.create(0, 0, 200000000000, 160000, 'FFFF00');		
+		updateobjects[updateobjects.length] = planet.create(0, 3000000, 3700000000, 74000, '787878');
+		updateobjects[updateobjects.length] = planet.create(0, 8321000, 4700000000, 77000, 'CC0000');
+		updateobjects[updateobjects.length] = planet.create(0, 12721000, 7000000000, 50000, 'CC3300');
+		updateobjects[updateobjects.length] = planet.create(0, 14942000, 4100000000, 96000, '787878');	
+		updateobjects[updateobjects.length] = planet.create(0, 17530000, 1200000000, 52000, '00CC00');
+		updateobjects[updateobjects.length] = planet.create(0, 18900000, 600000000, 43000, '0066FF');
 }
 
 function update(){
@@ -28,12 +38,13 @@ function update(){
 	var newtime = d.getTime();
 	var updatetime = (newtime - oldtime)/100;
 	updatetime = (updatetime > MAX_TIME_OUT) ? MAX_TIME_OUT : updatetime;
+	console.log(MAX_TIME_OUT + " : " + updatetime);
 
 	//gravity and collisions
 	for(i = 0; i < updateobjects.length; i++) {
 		for(j = 0; j < updateobjects.length; j++) {
     			if(i == j){continue;}
-			updateobjects[i].physical.gravity(updateobjects[j].physical, updatetime);
+			updateobjects[i].physical.gravity(updateobjects[j].physical, updatetime, 1);
 			updateobjects[i].collided(updateobjects[j].physical, updatetime);
 		}
 	}
@@ -86,7 +97,7 @@ function paint(){
 	for(i = updateobjects.length - 1; i >= 0; i--) {
 		updateobjects[i].draw();
 	}
-	map.line(updateobjects[3]);
+	if(playerui.gettarget() != null){map.line(updateobjects[playerui.gettarget()])};
 	
 
 	requestAnimationFrame(paint);
@@ -128,7 +139,10 @@ document.onmousewheel = function(event) {
 }
 
 document.onmousemove = function(event) {
-	//console.log(event);
+	mouseplace.x = event.clientX;
+	mouseplace.y = event.clientY;
+	
+
 }
 
 var map = {
@@ -168,7 +182,17 @@ var map = {
 
 		//draw the title
 		ctx.clearRect(0, 0, canv.width, canv.height);
-		ctx.fillText("Map.",50,50);
+		
+		//draw the ui
+		ctx.fillStyle= '#' + 'fff';		
+		ctx.fillRect(0, 0, canv.width, 40);
+		ctx.fillStyle= '#' + 'aaa';		
+		ctx.fillRect(0, 40, canv.width, 2);
+		
+		ctx.fillText("Map.",20,20);
+		
+
+		
 		//scale out
 		ctx.scale(1/this.p_factor, 1/this.p_factor);
 
@@ -176,15 +200,21 @@ var map = {
 		screen.x = (canv.width*this.p_factor)/2 + this.p_offsetx;
 		screen.y = (canv.height*this.p_factor)/2 + this.p_offsety;
 
-		//draw the planets
+		//Calculate the mouse
+		var mouseobj = particle.create(((mouseplace.x * this.p_factor) - screen.x), ((mouseplace.y * this.p_factor) - screen.y), 0, (14 * this.p_factor));
+
+		
+		//draw the ship
 		ctx.fillStyle= '#' + '900';
 		ctx.beginPath();
 		ctx.arc(updateobjects[0].physical.getx() + screen.x, updateobjects[0].physical.gety() + screen.y, (3 * this.p_factor), 0, 2 * Math.PI);
 		ctx.fill();
-
+		
+		//draw everything
 		for(i = updateobjects.length - 1; i >= 0; i--) {
 			updateobjects[i].draw();
 		}
+		this.mouseover(mouseobj);	
 		
 		ctx.scale(this.p_factor, this.p_factor);
 
@@ -192,6 +222,22 @@ var map = {
 		screen.x = this.p_screenx;
 		screen.y = this.p_screeny;
 		
+	},
+	
+	mouseover: function (mouseobj) {
+		
+		for(i = updateobjects.length - 1; i >= 0; i--) {
+			if(updateobjects[i].physical.havecollided(mouseobj)){
+				if(i != 0) {playerui.settarget(i);}
+				else{playerui.settarget(null);}
+				
+				//draw mouse
+				ctx.fillStyle= "rgba(0, 255, 255, 0.4)";
+				ctx.beginPath();
+				ctx.arc(mouseobj.getx() + screen.x, mouseobj.gety() + screen.y, mouseobj.getradius(), 0, 2 * Math.PI);
+				ctx.fill();
+			}
+		}
 	},
 	
 	left: function () {
