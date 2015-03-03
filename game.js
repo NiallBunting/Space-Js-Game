@@ -10,7 +10,7 @@ function start(){
 	playerui = playerdisplay.create();
 	createplanets();
 	var d = new Date();
-	oldtime = d.getTime();  
+	oldtime = d.getTime(); 
 	window.addEventListener('resize', resizeCanvas, false);
 	resizeCanvas();
 	requestAnimationFrame(paint);
@@ -23,7 +23,7 @@ function start(){
     }
     
 function createplanets(){
-		updateobjects[updateobjects.length] = planet.create(0, 0, 200000000000, 160000, 'FFFF00');		
+		updateobjects[updateobjects.length] = planet.create(0, 0, 20000000000000, 160000, 'FFFF00');		
 		updateobjects[updateobjects.length] = planet.create(0, 3000000, 3700000000, 74000, '787878');
 		updateobjects[updateobjects.length] = planet.create(0, 8321000, 4700000000, 77000, 'CC0000');
 		updateobjects[updateobjects.length] = planet.create(0, 12721000, 7000000000, 50000, 'CC3300');
@@ -38,7 +38,6 @@ function update(){
 	var newtime = d.getTime();
 	var updatetime = (newtime - oldtime)/100;
 	updatetime = (updatetime > MAX_TIME_OUT) ? MAX_TIME_OUT : updatetime;
-	console.log(MAX_TIME_OUT + " : " + updatetime);
 
 	//gravity and collisions
 	for(i = 0; i < updateobjects.length; i++) {
