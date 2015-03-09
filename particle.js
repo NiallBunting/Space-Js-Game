@@ -81,7 +81,7 @@ var particle = {
 		var xdist = obj.getx() - this.getx();
 		var ydist = obj.gety() - this.gety();
 		var dist = Math.sqrt((xdist * xdist) + (ydist * ydist));
-		var force = (grav * this.getmass() * obj.getmass()) / (dist * dist);
+		var force = (GAME_GRAVITY * this.getmass() * obj.getmass()) / (dist * dist);
 		this.p_xforce += positive * force * (xdist/dist) * time;
 		this.p_yforce += positive * force * (ydist/dist) * time;
 	},
@@ -137,10 +137,6 @@ var particle = {
 
 	getyspeed: function () {
 		return this.p_py - this.gety();
-	},
-
-	setspeedtorevolve: function(obj) {
-
 	},
 	
 	clone: function() {

@@ -1,8 +1,8 @@
 //gravity in the game
-var grav = 6;
+var GAME_GRAVITY = 6;
 
 //The max the game will jump on an update cycle
-var MAX_TIME_OUT = 0.3;
+var MAX_TIME_OUT = 0.2;
 
 //Global Varibles
 var canv;

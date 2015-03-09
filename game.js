@@ -23,13 +23,18 @@ function start(){
     }
     
 function createplanets(){
-		updateobjects[updateobjects.length] = planet.create(0, 0, 20000000000000, 160000, 'FFFF00');		
+		updateobjects[updateobjects.length] = planet.create(0, 0, 63000000000000, 160000, 'FFFF00');		
 		updateobjects[updateobjects.length] = planet.create(0, 3000000, 3700000000, 74000, '787878');
 		updateobjects[updateobjects.length] = planet.create(0, 8321000, 4700000000, 77000, 'CC0000');
 		updateobjects[updateobjects.length] = planet.create(0, 12721000, 7000000000, 50000, 'CC3300');
 		updateobjects[updateobjects.length] = planet.create(0, 14942000, 4100000000, 96000, '787878');	
 		updateobjects[updateobjects.length] = planet.create(0, 17530000, 1200000000, 52000, '00CC00');
 		updateobjects[updateobjects.length] = planet.create(0, 18900000, 600000000, 43000, '0066FF');
+		for(i = 2; i < updateobjects.length; i++) {
+			updateobjects[i].orbit(updateobjects[1]);
+		}
+		
+		updateobjects[updateobjects.length] = shipai.create();
 }
 
 function update(){
@@ -138,9 +143,10 @@ document.onmousewheel = function(event) {
 }
 
 document.onmousemove = function(event) {
-	mouseplace.x = event.clientX;
-	mouseplace.y = event.clientY;
-	
+
+var bounding_box=canv.getBoundingClientRect();
+mouseplace.x =(event.clientX - bounding_box.left) * (canv.width/bounding_box.width);        
+mouseplace.y =(event.clientY - bounding_box.top) * (canv.height/bounding_box.height); 
 
 }
 
@@ -200,7 +206,7 @@ var map = {
 		screen.y = (canv.height*this.p_factor)/2 + this.p_offsety;
 
 		//Calculate the mouse
-		var mouseobj = particle.create(((mouseplace.x * this.p_factor) - screen.x), ((mouseplace.y * this.p_factor) - screen.y), 0, (14 * this.p_factor));
+		var mouseobj = particle.create(((mouseplace.x * this.p_factor) - screen.x), ((mouseplace.y * this.p_factor) - screen.y), 0, (4 * this.p_factor));
 
 		
 		//draw the ship
