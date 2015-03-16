@@ -15,13 +15,15 @@ var ship = {
 	update: function(time){
 		this.physical.update(time);
 		this.p_direction += (this.p_spin * time);
+		if(this.p_direction > Math.PI){this.p_direction = -Math.PI;}
+		if(this.p_direction < -Math.PI){this.p_direction = Math.PI;}
 	},
 
 	updatescreen: function (){
 		screen.x = -this.physical.getx()+ canv.width/2;
 		screen.y = -this.physical.gety() + canv.height/2;
 		
-		console.log("X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed());
+		//console.log("X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed());
 	},
 	
 	draw: function() {
@@ -72,12 +74,10 @@ var ship = {
 	
 	collided: function(obj){
 		this.physical.collided(obj);
-		//ATTENTION, this does not allow fast movemment on planet
-		//if(this.physical.getspeed() > 10){
-			//destroy
-		//}else{
-			//land
-		//}
+	},
+	
+	getrotation: function(){
+		return this.p_direction;
 	}
 
 };

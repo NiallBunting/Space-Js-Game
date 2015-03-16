@@ -34,7 +34,7 @@ function createplanets(){
 			updateobjects[i].orbit(updateobjects[1]);
 		}
 		
-		updateobjects[updateobjects.length] = shipai.create();
+		updateobjects[updateobjects.length] = shipai.create(updateobjects[0]);
 }
 
 function update(){
@@ -96,12 +96,14 @@ function paint(){
 
 	//clear the screen
 	ctx.clearRect(0, 0, canv.width, canv.height);
-
+	
+	updateobjects[0].updatescreen();
+	
 	//Draw all the objects
 	for(i = updateobjects.length - 1; i >= 0; i--) {
 		updateobjects[i].draw();
 	}
-	updateobjects[0].updatescreen();
+
 	if(playerui.gettarget() != null){map.line(updateobjects[playerui.gettarget()])};
 	
 
