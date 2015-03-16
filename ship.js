@@ -14,25 +14,30 @@ var ship = {
 	
 	update: function(time){
 		this.physical.update(time);
-	
 		this.p_direction += (this.p_spin * time);
-		
+	},
+
+	updatescreen: function (){
 		screen.x = -this.physical.getx()+ canv.width/2;
 		screen.y = -this.physical.gety() + canv.height/2;
 		
 		console.log("X:" + Math.round(this.physical.getx()) + " Y:" + Math.round(this.physical.gety()) + " Speed:" + this.physical.getspeed());
-		
 	},
-
+	
 	draw: function() {
 		ctx.fillStyle= '#' + '900';
 		ctx.beginPath();
 		//ctx.arc(canv.width/2, canv.height/2, this.physical.getradius(), 0, 2 * Math.PI);
 
 		//https://en.wikipedia.org/wiki/Circle#Equations
-		ctx.moveTo(canv.width/2 + (this.physical.getradius() * Math.cos(this.p_direction)) , canv.height/2 + (this.physical.getradius() * Math.sin(this.p_direction)));
-		ctx.lineTo(canv.width/2 + (this.physical.getradius() * Math.cos(this.p_direction + 2.4)) , canv.height/2 + (this.physical.getradius() * Math.sin(this.p_direction + 2.4)));
-		ctx.lineTo(canv.width/2 + (this.physical.getradius() * Math.cos(this.p_direction + 3.8)) , canv.height/2 + (this.physical.getradius() * Math.sin(this.p_direction + 3.8)));
+		//ctx.moveTo(canv.width/2 + (this.physical.getradius() * Math.cos(this.p_direction)) , canv.height/2 + (this.physical.getradius() * Math.sin(this.p_direction)));
+		//ctx.lineTo(canv.width/2 + (this.physical.getradius() * Math.cos(this.p_direction + 2.4)) , canv.height/2 + (this.physical.getradius() * Math.sin(this.p_direction + 2.4)));
+		//ctx.lineTo(canv.width/2 + (this.physical.getradius() * Math.cos(this.p_direction + 3.8)) , canv.height/2 + (this.physical.getradius() * Math.sin(this.p_direction + 3.8)));
+		
+		ctx.moveTo(this.physical.getx() + screen.x + (this.physical.getradius() * Math.cos(this.p_direction)) , this.physical.gety() + screen.y + (this.physical.getradius() * Math.sin(this.p_direction)));
+		ctx.lineTo(this.physical.getx() + screen.x + (this.physical.getradius() * Math.cos(this.p_direction + 2.4)) , this.physical.gety() + screen.y + (this.physical.getradius() * Math.sin(this.p_direction + 2.4)));
+		ctx.lineTo(this.physical.getx() + screen.x + (this.physical.getradius() * Math.cos(this.p_direction + 3.8)) , this.physical.gety() + screen.y + (this.physical.getradius() * Math.sin(this.p_direction + 3.8)));
+		
 		ctx.closePath();
 		ctx.fill();
 	},

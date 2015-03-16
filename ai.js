@@ -6,7 +6,7 @@ var shipai = {
 		var obj = Object.create(this);
 		obj.ship = ship.create();
 		obj.physical = obj.ship.physical;
-		obj.physical.setx(10000);
+		obj.ship.physical.setx(10);
 		return obj;
 	},
 

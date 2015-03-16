@@ -101,6 +101,7 @@ function paint(){
 	for(i = updateobjects.length - 1; i >= 0; i--) {
 		updateobjects[i].draw();
 	}
+	updateobjects[0].updatescreen();
 	if(playerui.gettarget() != null){map.line(updateobjects[playerui.gettarget()])};
 	
 
