@@ -34,19 +34,29 @@ var shipai = {
 	},
 	
 	attack: function(){
-		var direction = Math.atan2(this.physical.getx() - this.p_player.physical.getx(), this.physical.gety() - this.p_player.physical.gety());
+		var directiontoship = Math.atan2(this.p_player.physical.gety() - this.physical.gety(), this.p_player.physical.getx() - this.physical.getx());
 		
-		console.log("D:" + direction);
+		console.log("D:" + directiontoship);
 		
-		var normaledshipdirec = this.ship.getrotation();
-		//- (Math.PI/2);
-		//if(normaledshipdirec < -Math.PI){normaledshipdirec += (Math.PI * 2);}
+		var direction = this.ship.getrotation() - directiontoship;	
+		console.log(direction);
+		if(direction < -Math.PI){direction += Math.PI * 2;}	
+		if(direction > Math.PI){direction -= Math.PI * 2;}
+
+		console.log(direction);
 		
-		//var diffrence = direction - normaledshipdirec;
-		
-		
-		console.log(normaledshipdirec);
-		//this.ship.spin(true);
+		if(direction > 0){
+			console.log("false");
+			this.ship.spin(false);
+		}
+
+		if(direction < 0){
+			console.log("true");
+			this.ship.spin(true);
+		}
+
+		//this.ship.up();
+
 	}
 	
 }
