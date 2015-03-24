@@ -34,29 +34,33 @@ var shipai = {
 	},
 	
 	attack: function(){
-		var directiontoship = Math.atan2(this.p_player.physical.gety() - this.physical.gety(), this.p_player.physical.getx() - this.physical.getx());
+		var dir = this.pointat(this.p_player);
 		
-		console.log("D:" + directiontoship);
+		var disttoplayer = calculate_distance(this.physical.getx(), this.p_player.physical.getx(), this.physical.gety(), this.p_player.physical.gety());
 		
-		var direction = this.ship.getrotation() - directiontoship;	
-		console.log(direction);
+		if(disttoplayer > 250 && dir > -0.1 && dir < 0.1){
+			this.ship.up();
+		}
+		
+		if(disttoplayer < 250){
+			this.ship.down();
+		}
+
+	},
+	
+	pointat: function(obj){
+		var directiontoship = Math.atan2(obj.physical.gety() - this.physical.gety(), obj.physical.getx() - this.physical.getx());
+		
+		var direction = directiontoship - this.ship.p_direction;
 		if(direction < -Math.PI){direction += Math.PI * 2;}	
 		if(direction > Math.PI){direction -= Math.PI * 2;}
-
-		console.log(direction);
+		var returnval = direction;
 		
-		if(direction > 0){
-			console.log("false");
-			this.ship.spin(false);
-		}
-
-		if(direction < 0){
-			console.log("true");
-			this.ship.spin(true);
-		}
-
-		//this.ship.up();
-
+		if (direction < 0 && direction < this.ship.p_power[2]){direction = this.ship.p_power[2];}
+		if (direction > 0 && direction > this.ship.p_power[3]){direction = this.ship.p_power[3];}
+		
+		this.ship.p_direction += direction;
+		return returnval;
 	}
 	
 }
