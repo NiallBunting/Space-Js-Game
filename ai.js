@@ -40,14 +40,24 @@ var shipai = {
 		
 		var speeddiffrence = this.physical.getspeed() / this.p_player.physical.getspeed();
 		
-		console.log(speeddiffrence);
+		console.log(speeddiffrence + " " + disttoplayer); 
 		
-		if(disttoplayer > 250){
-			if(dir > -0.1 && dir < 0.1){
+		if(disttoplayer > 1000){
+			if(dir > -0.18 && dir < 0.18){
 				this.ship.up();
-				if(speeddiffrence < 1.04){
-					this.ship.down();
-				}
+			}
+		}
+		
+		if(disttoplayer > 250 && disttoplayer < 1000){
+			if(dir > -0.1 && dir < 0.1){
+				if(speeddiffrence < 1.04){this.ship.up(); console.log("F");}
+				else{this.ship.down(); console.log("B");}
+			}
+		}
+		
+		if(disttoplayer > 30 && disttoplayer < 300){
+			if(dir > -0.5 && dir < 0.5){
+					this.ship.shoot();
 			}
 		}
 		

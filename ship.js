@@ -78,6 +78,10 @@ var ship = {
 	
 	getrotation: function(){
 		return this.p_direction;
+	},
+	
+	shoot: function() {
+		return;
 	}
 
 };
