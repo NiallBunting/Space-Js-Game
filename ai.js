@@ -6,6 +6,7 @@ var shipai = {
 	p_destinationx: 0,
 	p_destinationy: 0,
 	p_player: 0,
+	p_previousdisttoattack: 0,
 		
 	create: function(player){
 		var obj = Object.create(this);
@@ -17,7 +18,7 @@ var shipai = {
 	},
 
 	update: function(time){		
-		this.attack();
+		this.attack(this.p_player);
 		this.ship.update(time);
 	},
 
@@ -33,26 +34,40 @@ var shipai = {
 		this.ship.draw();
 	},
 	
-	attack: function(){
-		var dir = this.pointat(this.p_player);
+	attack: function(obj){
+		//this function can cause the ship to effectivly orbit
+		var dir = this.pointat(obj);
 		
-		var disttoplayer = calculate_distance(this.physical.getx(), this.p_player.physical.getx(), this.physical.gety(), this.p_player.physical.gety());
+		var disttoplayer = calculate_distance(this.physical.getx(),obj.physical.getx(), this.physical.gety(), obj.physical.gety());
 		
-		var speeddiffrence = this.physical.getspeed() / this.p_player.physical.getspeed();
+		var speeddiffrence = this.physical.getspeed() / obj.physical.getspeed();
 		
-		console.log(speeddiffrence + " " + disttoplayer); 
+		console.log(speeddiffrence + " " + disttoplayer + " " + dir);
 		
-		if(disttoplayer > 1000){
-			if(dir > -0.18 && dir < 0.18){
+		var speedcorrecter = 1;
+		for(var i = (speeddiffrence - 1.1);i > 0;i -= 0.1){
+			speedcorrecter++;
+		}
+		
+		speedcorrecter *= speedcorrecter;
+		
+		if(disttoplayer > (1500 * speedcorrecter)){
+			if(dir > -0.15 && dir < 0.15){
 				this.ship.up();
 			}
 		}
 		
-		if(disttoplayer > 250 && disttoplayer < 1000){
+		if(disttoplayer > (250 * speedcorrecter) && disttoplayer < (1500 * speedcorrecter)){
 			if(dir > -0.1 && dir < 0.1){
-				if(speeddiffrence < 1.04){this.ship.up(); console.log("F");}
-				else{this.ship.down(); console.log("B");}
+				if(this.p_previousdisttoattack > disttoplayer){
+					if(speeddiffrence < 1.04){this.ship.up();}
+					else{this.ship.down();}
+				}
+				else{
+					this.ship.up();
+				}				
 			}
+			this.p_previousdisttoattack = disttoplayer;
 		}
 		
 		if(disttoplayer > 30 && disttoplayer < 300){
@@ -61,10 +76,8 @@ var shipai = {
 			}
 		}
 		
-		if(disttoplayer < 250){
-			if(speeddiffrence > 0.97){
+		if(disttoplayer < (250 * speedcorrecter)){
 				this.ship.down();
-			}
 		}
 
 	},

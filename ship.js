@@ -81,6 +81,10 @@ var ship = {
 	},
 	
 	shoot: function() {
+        console.log("shoots");
+	},
+	
+	destroy: function() {
 		return;
 	}
 
