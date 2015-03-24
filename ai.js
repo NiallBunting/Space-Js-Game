@@ -38,12 +38,23 @@ var shipai = {
 		
 		var disttoplayer = calculate_distance(this.physical.getx(), this.p_player.physical.getx(), this.physical.gety(), this.p_player.physical.gety());
 		
-		if(disttoplayer > 250 && dir > -0.1 && dir < 0.1){
-			this.ship.up();
+		var speeddiffrence = this.physical.getspeed() / this.p_player.physical.getspeed();
+		
+		console.log(speeddiffrence);
+		
+		if(disttoplayer > 250){
+			if(dir > -0.1 && dir < 0.1){
+				this.ship.up();
+				if(speeddiffrence < 1.04){
+					this.ship.down();
+				}
+			}
 		}
 		
 		if(disttoplayer < 250){
-			this.ship.down();
+			if(speeddiffrence > 0.97){
+				this.ship.down();
+			}
 		}
 
 	},
