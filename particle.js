@@ -1,6 +1,7 @@
 var particle = {
 
 	//The internal values, prefixed with a p_ (for private)
+	p_type: 0,
    	p_mass: 0,
 	p_xforce: 0,
 	p_yforce: 0,
@@ -11,8 +12,9 @@ var particle = {
 	p_density: 1,
 	p_width:1,
 
-        create: function (x, y, mass, width) {
+        create: function (type, x, y, mass, width) {
             var obj = Object.create(this);
+		obj.p_type = type;
 	    obj.setx(x);
 	    obj.sety(y);
 	    obj.setmass(mass);
@@ -54,6 +56,10 @@ var particle = {
 		
 	getradius: function () {
 		return this.p_width;
+	},
+	
+	gettype: function(){
+		return this.p_type;
 	},
 
 	//updated all the physics

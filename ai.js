@@ -42,7 +42,7 @@ var shipai = {
 		
 		var speeddiffrence = this.physical.getspeed() / obj.physical.getspeed();
 		
-		//console.log(speeddiffrence+ " " + this.physical.getspeed() + ":" +  obj.physical.getspeed() + " " + disttoplayer + " " + dir);
+		console.log(speeddiffrence+ " " + disttoplayer + " " + dir);
 		
 		var speedcorrecter = 1;
 		for(var i = (speeddiffrence - 1.1);i > 0;i -= 0.1){

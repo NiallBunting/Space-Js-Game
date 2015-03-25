@@ -1,6 +1,5 @@
 var updateobjects = [];
 var playerui;
-var d = new Date();
 
 function start(){
 	//canvas set up	
@@ -10,10 +9,21 @@ function start(){
 	updateobjects[updateobjects.length] = ship.create();
 	playerui = playerdisplay.create();
 	createplanets();
+	var d = new Date();
 	oldtime = d.getTime(); 
 	window.addEventListener('resize', resizeCanvas, false);
 	resizeCanvas();
 	requestAnimationFrame(paint);
+}
+
+function removeobject(obj){
+	for(i = 0; i < updateobjects.length; i++) {
+		if(i.physical.gettype() == "ship"){
+			if(i.ship == obj){
+				updateobjects[i] = updateobjects[updateobjects.length - 1];
+			}
+		}
+	} 
 }
 
 //http://stackoverflow.com/questions/4288253/html5-canvas-100-width-height-of-viewport
@@ -38,7 +48,7 @@ function createplanets(){
 }
 
 function update(){
-
+	var d = new Date();
 	var newtime = d.getTime();
 	var updatetime = (newtime - oldtime)/100;
 	updatetime = (updatetime > MAX_TIME_OUT) ? MAX_TIME_OUT : updatetime;
@@ -150,9 +160,9 @@ document.onmousewheel = function(event) {
 
 document.onmousemove = function(event) {
 
-var bounding_box=canv.getBoundingClientRect();
-mouseplace.x =(event.clientX - bounding_box.left) * (canv.width/bounding_box.width);        
-mouseplace.y =(event.clientY - bounding_box.top) * (canv.height/bounding_box.height); 
+	var bounding_box=canv.getBoundingClientRect();
+	mouseplace.x =(event.clientX - bounding_box.left) * (canv.width/bounding_box.width);        
+	mouseplace.y =(event.clientY - bounding_box.top) * (canv.height/bounding_box.height); 
 
 }
 

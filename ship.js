@@ -4,12 +4,14 @@ var ship = {
 	// power forward, back, left, right
 	p_power: [10 , -3, -0.01, 0.01],
 	p_spin: 0,
+	p_hp: 100,
+	p_armour: 0,
 
 	create: function(){
 		var obj = Object.create(this);
 		 //12680000
-		obj.physical = particle.create(0, 17590000, 10, 10);
-		//obj.weapon = weapon.create("machinegun", 50, 0.001, 500, 4000, 300, 20);
+		obj.physical = particle.create("ship", 0, 17590000, 10, 10);
+		obj.weapon = weapon.create("machinegun", 50, 75, 500, 4000, 300, 20, 0.9);
 		return obj;
 	},
 	
@@ -18,6 +20,7 @@ var ship = {
 		this.p_direction += (this.p_spin * time);
 		if(this.p_direction > Math.PI){this.p_direction = -Math.PI;}
 		if(this.p_direction < -Math.PI){this.p_direction = Math.PI;}
+		if(this.p_hp <= 0){this.destroy();}
 	},
 
 	updatescreen: function (){
@@ -44,7 +47,7 @@ var ship = {
 		ctx.closePath();
 		ctx.fill();
 		
-		//this.weapon.draw(this);
+		this.weapon.draw(this);
 	},
 
 
@@ -84,13 +87,21 @@ var ship = {
 	},
 	
 	shoot: function() {
-        //this.weapon.shoot(this);
+        this.weapon.shoot(this);
 	},
 	
 	destroy: function() {
+		removeship(this);
 		return;
-	}
+	},
+	
+	damage: function(damage){
+		var armoureffect = Math.min(((Math.random() * 0.5) * damage), this.p_armour);
+		
+		this.p_armour -= armoureffect;
+		this.p_hp -= (damage - armoureffect);
 
+	}
 };
 
 var weapon = {
@@ -101,13 +112,15 @@ var weapon = {
 	p_reloadtime: 0, // reload time
 	p_maxdistance: 0, //distance rounds fires
 	p_power: 0,
+	p_accuraccy: 0,
 	p_draw: false,
 	
 	p_currentmag: 0, //Players mag ammo
 	p_currentammo: 0, // Players ammo
 	p_currentreloadreadytime: 0, //If time is after this then ready
+	p_currentshootagaintime: 0,
 	
-	create: function(type, magrounds, firetime, ammo, reloadtime, maxdistance, power){
+	create: function(type, magrounds, firetime, ammo, reloadtime, maxdistance, power, accuraccy){
 		var obj = Object.create(this);
 		obj.p_type = type;
 		obj.p_magrounds = obj.p_currentmag = magrounds;
@@ -116,19 +129,22 @@ var weapon = {
 		obj.p_reloadtime = reloadtime;
 		obj.p_maxdistance = maxdistance;
 		obj.p_power = power;
-		obj.p_currentreloadreadytime = d.getTime();
+		obj.p_accuraccy = accuraccy;
+		var d = new Date();
+		obj.p_currentreloadreadytime = obj.p_currentshootagaintime = d.getTime();
 		return obj;
 	},
 	
 	draw: function(ship){
-		if(this.p_draw <= 0){return;}
-		this.p_draw--;
-	
-		ctx.fillStyle= '#' + 'fff';
-		ctx.beginPath();
-		ctx.moveTo(ship.physical.getx() + screen.x + (ship.physical.getradius() * Math.cos(ship.p_direction)) , ship.physical.gety() + screen.y + (ship.physical.getradius() * Math.sin(ship.p_direction)));
-		ctx.lineTo(ship.physical.getx() + screen.x + (this.p_maxdistance * Math.cos(ship.p_direction)) , ship.physical.gety() + screen.y + (this.p_maxdistance * Math.sin(ship.p_direction)));
-		ctx.stroke();
+		while(this.p_draw > 0){
+			this.p_draw--;
+		
+			ctx.fillStyle= '#' + 'fff';
+			ctx.beginPath();
+			ctx.moveTo(ship.physical.getx() + screen.x + (ship.physical.getradius() * Math.cos(ship.p_direction)) , ship.physical.gety() + screen.y + (ship.physical.getradius() * Math.sin(ship.p_direction)));
+			ctx.lineTo(ship.physical.getx() + screen.x + (this.p_maxdistance * (Math.cos(ship.p_direction) + this.accuracyeffect())) , ship.physical.gety() + screen.y + (this.p_maxdistance * (Math.sin(ship.p_direction) + this.accuracyeffect())));
+			ctx.stroke();
+		}
 	},
 	
 	gettype:function(){
@@ -136,17 +152,41 @@ var weapon = {
 	},
 	
 	shoot: function(ship){
-		if(this.reload() != 1){return;} //Still reloading or now reloading
-		//console.log(this.p_currentmag + " " + this.p_currentammo);
-		this.p_draw = 1;
+		var d = new Date()
+		if(this.reload() != 1){return 0;} //Still reloading or now reloading
+		
+		//Now checks time to shoot has passed
+		if(this.p_currentshootagaintime > d.getTime()){return 0;}	
+		
+		console.log(this.p_currentmag + " " + this.p_currentammo);
+		
+		//Adds reshoot time
+		this.p_currentshootagaintime = d.getTime() + this.p_firetime;
+		//Draws the round
+		if(Math.random() > 0){this.p_draw++;}
+		// Removes one from current mag
 		this.p_currentmag--;
+		
+		//Needs to do do damage
 	},
 	
 	reload: function(){
+		var d = new Date();
 		//Checks if time is up and ammo is 0 to refill
-		if(d.getTime() > this.p_currentreloadreadytime && this.p_currentmag == 0){
-			this.p_currentmag = this.p_magrounds;
-			this.p_currentammo -= this.p_magrounds;
+		if(d.getTime() < this.p_currentreloadreadytime && this.p_currentmag == 0){
+			if(this.p_currentammo >= this.p_magrounds){
+				this.p_currentmag = this.p_magrounds;
+				this.p_currentammo -= this.p_magrounds;
+			}
+			else{
+				if(this.p_currentammo > 0){
+					this.p_currentmag = this.p_currentammo;
+					this.p_currentammo = 0;
+				}
+				else{
+					return 0;
+				}
+			}
 			return 1;
 		}
 				
@@ -157,11 +197,17 @@ var weapon = {
 		
 		//Out of ammo so reloads
 		if(this.p_currentmag <= 0){
-			this.p_currentreloadreadytime = d.getTime() + p_reloadtime;
+			this.p_currentreloadreadytime = d.getTime() + this.p_reloadtime;
 			return 0;
 		}
 		
 		return 1;
 		
+	},
+	
+	accuracyeffect: function(){
+		var accuracytop = (1 - this.p_accuraccy);
+		var accuracybottom = 0 - (1 - this.p_accuraccy);
+		return ((Math.random() * accuracytop * 2) + accuracybottom);
 	}
 };
