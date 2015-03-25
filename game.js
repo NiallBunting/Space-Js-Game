@@ -1,5 +1,6 @@
 var updateobjects = [];
 var playerui;
+var d = new Date();
 
 function start(){
 	//canvas set up	
@@ -9,7 +10,6 @@ function start(){
 	updateobjects[updateobjects.length] = ship.create();
 	playerui = playerdisplay.create();
 	createplanets();
-	var d = new Date();
 	oldtime = d.getTime(); 
 	window.addEventListener('resize', resizeCanvas, false);
 	resizeCanvas();
@@ -39,7 +39,6 @@ function createplanets(){
 
 function update(){
 
-	var d = new Date();
 	var newtime = d.getTime();
 	var updatetime = (newtime - oldtime)/100;
 	updatetime = (updatetime > MAX_TIME_OUT) ? MAX_TIME_OUT : updatetime;

@@ -20,6 +20,3 @@ var keys = [];
 var mouseplace = {};
 mouseplace.x = 0;
 mouseplace.y = 0;
-
-//Testvalue
-var test = 1;

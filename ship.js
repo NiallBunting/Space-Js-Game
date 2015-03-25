@@ -9,6 +9,7 @@ var ship = {
 		var obj = Object.create(this);
 		 //12680000
 		obj.physical = particle.create(0, 17590000, 10, 10);
+		//obj.weapon = weapon.create("machinegun", 50, 0.001, 500, 4000, 300, 20);
 		return obj;
 	},
 	
@@ -42,6 +43,8 @@ var ship = {
 		
 		ctx.closePath();
 		ctx.fill();
+		
+		//this.weapon.draw(this);
 	},
 
 
@@ -81,11 +84,84 @@ var ship = {
 	},
 	
 	shoot: function() {
-        console.log("shoots");
+        //this.weapon.shoot(this);
 	},
 	
 	destroy: function() {
 		return;
 	}
 
+};
+
+var weapon = {
+	p_type: 0, //Weapon Type
+	p_magrounds: 0, // Rounds in magazine
+	p_firetime: 0, // Time betweenshots
+	p_ammo: 0, // Total ammo
+	p_reloadtime: 0, // reload time
+	p_maxdistance: 0, //distance rounds fires
+	p_power: 0,
+	p_draw: false,
+	
+	p_currentmag: 0, //Players mag ammo
+	p_currentammo: 0, // Players ammo
+	p_currentreloadreadytime: 0, //If time is after this then ready
+	
+	create: function(type, magrounds, firetime, ammo, reloadtime, maxdistance, power){
+		var obj = Object.create(this);
+		obj.p_type = type;
+		obj.p_magrounds = obj.p_currentmag = magrounds;
+		obj.p_firetime = firetime;
+		obj.p_ammo = obj.p_currentammo = ammo;
+		obj.p_reloadtime = reloadtime;
+		obj.p_maxdistance = maxdistance;
+		obj.p_power = power;
+		obj.p_currentreloadreadytime = d.getTime();
+		return obj;
+	},
+	
+	draw: function(ship){
+		if(this.p_draw <= 0){return;}
+		this.p_draw--;
+	
+		ctx.fillStyle= '#' + 'fff';
+		ctx.beginPath();
+		ctx.moveTo(ship.physical.getx() + screen.x + (ship.physical.getradius() * Math.cos(ship.p_direction)) , ship.physical.gety() + screen.y + (ship.physical.getradius() * Math.sin(ship.p_direction)));
+		ctx.lineTo(ship.physical.getx() + screen.x + (this.p_maxdistance * Math.cos(ship.p_direction)) , ship.physical.gety() + screen.y + (this.p_maxdistance * Math.sin(ship.p_direction)));
+		ctx.stroke();
+	},
+	
+	gettype:function(){
+		return this.p_type;
+	},
+	
+	shoot: function(ship){
+		if(this.reload() != 1){return;} //Still reloading or now reloading
+		//console.log(this.p_currentmag + " " + this.p_currentammo);
+		this.p_draw = 1;
+		this.p_currentmag--;
+	},
+	
+	reload: function(){
+		//Checks if time is up and ammo is 0 to refill
+		if(d.getTime() > this.p_currentreloadreadytime && this.p_currentmag == 0){
+			this.p_currentmag = this.p_magrounds;
+			this.p_currentammo -= this.p_magrounds;
+			return 1;
+		}
+				
+		//Checks if still reloading
+		if(d.getTime() <= this.p_currentreloadreadytime){
+			return 0;
+		}
+		
+		//Out of ammo so reloads
+		if(this.p_currentmag <= 0){
+			this.p_currentreloadreadytime = d.getTime() + p_reloadtime;
+			return 0;
+		}
+		
+		return 1;
+		
+	}
 };
