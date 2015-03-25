@@ -187,7 +187,7 @@ var map = {
 			this.p_previouspress = 1;
 		}
 		if(keys[77] == false){
-			this.p_previouspress = 0;
+			this.p_previouspress = 0 ;
 		}
 
 		return this.p_open;
