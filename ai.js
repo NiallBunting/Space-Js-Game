@@ -7,19 +7,20 @@ var shipai = {
 	p_destinationy: 0,
 	p_player: 0,
 	p_previousdisttoattack: 0,
+	p_previousangletoattack: 0,
 		
 	create: function(player){
 		var obj = Object.create(this);
 		obj.ship = ship.create();
 		obj.physical = obj.ship.physical;
-		obj.physical.setx(10);
-		this.p_player = player;
+		obj.physical.setx((100 * Math.random()) - 50);
+		obj.p_player = player;
 		return obj;
 	},
 
 	update: function(time){		
 		this.attack(this.p_player);
-		this.ship.update(time);
+		return this.ship.update(time);
 	},
 
 	draw: function() {
@@ -36,13 +37,15 @@ var shipai = {
 	
 	attack: function(obj){
 		//this function can cause the ship to effectivly orbit
-		var dir = this.pointat(obj);
+		var point = this.pointat(obj);
+		
+		var dir = point[0];
 		
 		var disttoplayer = calculate_distance(this.physical.getx(),obj.physical.getx(), this.physical.gety(), obj.physical.gety());
 		
 		var speeddiffrence = this.physical.getspeed() / obj.physical.getspeed();
 		
-		console.log(speeddiffrence+ " " + disttoplayer + " " + dir);
+		//console.log(speeddiffrence+ " " + disttoplayer + " " + dir);
 		
 		var speedcorrecter = 1;
 		for(var i = (speeddiffrence - 1.1);i > 0;i -= 0.1){
@@ -76,7 +79,7 @@ var shipai = {
 			}
 		}
 		
-		if(disttoplayer < (250 * speedcorrecter)){
+		if(disttoplayer < 50){
 				this.ship.down();
 		}
 
@@ -94,7 +97,7 @@ var shipai = {
 		if (direction > 0 && direction > this.ship.p_power[3]){direction = this.ship.p_power[3];}
 		
 		this.ship.p_direction += direction;
-		return returnval;
+		return [returnval, directiontoship];
 	}
 	
 }

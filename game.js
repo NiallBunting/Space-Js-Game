@@ -1,133 +1,201 @@
-var updateobjects = [];
-var playerui;
-
-function start(){
-	//canvas set up	
-	canv=document.getElementById("mycan");
-	ctx=mycan.getContext("2d");	
-	ctx.font="20px Georgia";
-	updateobjects[updateobjects.length] = ship.create();
-	playerui = playerdisplay.create();
-	createplanets();
-	var d = new Date();
-	oldtime = d.getTime(); 
-	window.addEventListener('resize', resizeCanvas, false);
-	resizeCanvas();
-	requestAnimationFrame(paint);
-}
-
-function removeobject(obj){
-	for(i = 0; i < updateobjects.length; i++) {
-		if(i.physical.gettype() == "ship"){
-			if(i.ship == obj){
-				updateobjects[i] = updateobjects[updateobjects.length - 1];
-			}
-		}
-	} 
-}
-
-//http://stackoverflow.com/questions/4288253/html5-canvas-100-width-height-of-viewport
-    function resizeCanvas() {
-            canv.width = window.innerWidth;
-            canv.height = window.innerHeight;
-    }
-    
-function createplanets(){
-		updateobjects[updateobjects.length] = planet.create(0, 0, 63000000000000, 160000, 'FFFF00');		
-		updateobjects[updateobjects.length] = planet.create(0, 3000000, 3700000000, 74000, '787878');
-		updateobjects[updateobjects.length] = planet.create(0, 8321000, 4700000000, 77000, 'CC0000');
-		updateobjects[updateobjects.length] = planet.create(0, 12721000, 7000000000, 50000, 'CC3300');
-		updateobjects[updateobjects.length] = planet.create(0, 14942000, 4100000000, 96000, '787878');	
-		updateobjects[updateobjects.length] = planet.create(0, 17530000, 1200000000, 52000, '00CC00');
-		updateobjects[updateobjects.length] = planet.create(0, 18900000, 600000000, 43000, '0066FF');
-		for(i = 2; i < updateobjects.length; i++) {
-			updateobjects[i].orbit(updateobjects[1]);
+var game = {
+	p_gamegrav: 6,
+	p_maxtimeout: 0.2,
+	p_canv: 0,
+	p_ctx: 0,
+	p_oldtime: 0,
+	//inputdevices
+	p_keys: 0,
+	p_mousewheel: 0,
+	p_mousepos: 0,
+	
+	p_player: 0,
+	p_objects: 0,
+	p_drawobjects: 0,
+	
+	init: function(){
+		//Variables
+		this.screen = {};
+		this.screen.x = 0;
+		this.screen.y = 0;
+		this.p_keys = [];
+		this.p_mousepos = [];
+		this.p_gamegrav = C_GAME_GRAVITY;
+		this.p_maxtimeout = C_MAX_TIME_OUT;
+		this.p_objects = [];
+		
+		//Initialise Canvas, and allow canvas resizing
+		this.p_canv=document.getElementById("mycan");
+		this.p_ctx=this.p_canv.getContext("2d");	
+		this.p_ctx.font="20px Georgia";
+		window.addEventListener('resize', this.resizecanvas, false);
+		this.resizecanvas();
+		
+		//Create time
+		this.updatetime();
+		
+		//Creates the player and the planets
+		this.createuniverse();
+		
+		//for(var i = 0; i < 10000; i++){
+		//	this.update();
+		//	this.draw();
+		//}
+		requestAnimationFrame(game.draw);
+	},
+	
+	resizecanvas: function(){
+		//http://stackoverflow.com/questions/4288253/html5-canvas-100-width-height-of-viewport
+		game.p_canv.width = window.innerWidth;
+		game.p_canv.height = window.innerHeight;
+	},
+	
+	createuniverse: function(){
+		this.p_objects[this.p_objects.length] = ship.create();
+		this.p_player = this.p_objects[this.p_objects.length - 1];
+		
+		this.p_objects[this.p_objects.length] = planet.create(0, 0, 63000000000000, 160000, 'FFFF00');		
+		this.p_objects[this.p_objects.length] = planet.create(0, 3000000, 3700000000, 74000, '787878');
+		this.p_objects[this.p_objects.length] = planet.create(0, 8321000, 4700000000, 77000, 'CC0000');
+		this.p_objects[this.p_objects.length] = planet.create(0, 12721000, 7000000000, 50000, 'CC3300');
+		this.p_objects[this.p_objects.length] = planet.create(0, 14942000, 4100000000, 96000, '787878');	
+		this.p_objects[this.p_objects.length] = planet.create(0, 17530000, 1200000000, 52000, '00CC00');
+		this.p_objects[this.p_objects.length] = planet.create(0, 18900000, 600000000, 43000, '0066FF');
+		for(i = 2; i < this.p_objects.length; i++) {
+			this.p_objects[i].orbit(this.p_objects[1]);
 		}
 		
-		updateobjects[updateobjects.length] = shipai.create(updateobjects[0]);
-}
-
-function update(){
-	var d = new Date();
-	var newtime = d.getTime();
-	var updatetime = (newtime - oldtime)/100;
-	updatetime = (updatetime > MAX_TIME_OUT) ? MAX_TIME_OUT : updatetime;
-
-	//gravity and collisions
-	for(i = 0; i < updateobjects.length; i++) {
-		for(j = 0; j < updateobjects.length; j++) {
+		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+		//this.p_objects[this.p_objects.length] = shipai.create(this.p_objects[this.p_objects.length - 1]);
+	},
+	
+	update: function(){
+		//checks for keypresses
+		this.keypresses();
+		
+		//Updates the time
+		var oldtime = this.gettime();
+		this.updatetime();
+		var updatetime = (this.gettime() - oldtime)/100;
+		updatetime = (updatetime > this.p_maxtimeout) ? this.p_maxtimeout : updatetime;
+		
+		//Updates gravity and collisions
+		for(i = 0; i < this.p_objects.length; i++) {
+			for(j = 0; j < this.p_objects.length; j++) {
     			if(i == j){continue;}
-			updateobjects[i].physical.gravity(updateobjects[j].physical, updatetime, 1);
-			updateobjects[i].collided(updateobjects[j].physical, updatetime);
+				this.p_objects[i].physical.gravity(this.p_objects[j].physical, updatetime, 1);
+				this.p_objects[i].collided(this.p_objects[j].physical, updatetime);
+			}
 		}
-	}
-
-	//Update all the objects
-	for(i = 0; i < updateobjects.length; i++) {
-		updateobjects[i].update(updatetime);
-	}
-
-	oldtime = newtime;
-}
-
-
-
-function paint(){
-	//left
-	  if(keys[37] == true){
-		if(map.ismapopen()){map.left();}
-		else{updateobjects[0].left();}
-	  }
-
-	//right
-	  if(keys[39] == true){
-		if(map.ismapopen()){map.right();}
-		else{updateobjects[0].right();}
-	  }
-
-	//up
-	  if(keys[38] == true){
-		if(map.ismapopen()){map.up();}
-		else{updateobjects[0].up();}
-	  }
-
-	//down
-	  if(keys[40] == true){
-		if(map.ismapopen()){map.down();}
-		else{updateobjects[0].down();}
-	  }
-	  
-	//space
-	  if(keys[32] == true){
-		if(map.ismapopen()){}
-		else{updateobjects[0].shoot();}
-	  }
-	  
-	//Toggles map, if pressed
-	if(map.draw() != false){requestAnimationFrame(paint); return;}
-
-	update();
-
-	//clear the screen
-	ctx.clearRect(0, 0, canv.width, canv.height);
+		
+		//Updates the positions
+		for(i = 0; i < this.p_objects.length; i++) {
+			var val = this.p_objects[i].update(updatetime);
+			if (val == 9){
+				if(this.p_objects[i] == this.p_player){
+					this.playerkilled();
+				}
+				this.p_objects.splice(i, 1);
+			}
+		}
+		
+	},
 	
-	updateobjects[0].updatescreen();
+	draw: function(){
+
+		game.update();
 	
-	//Draw all the objects
-	for(i = updateobjects.length - 1; i >= 0; i--) {
-		updateobjects[i].draw();
+		//clear the screen
+		game.getcontext().clearRect(0, 0, game.getcanvas().width, game.getcanvas().height);
+		
+		//Sets the canvas pos on player
+		game.setcanvaspos(game.p_player);
+	
+		//Draw all the objects
+		for(i = game.p_objects.length - 1; i >= 0; i--) {
+			game.p_objects[i].draw();
+		}
+		
+		requestAnimationFrame(game.draw);
+	},
+	
+	keypresses: function(){
+		//left
+		if(this.p_keys[37] == true){
+			this.p_player.left();
+		}
+
+		//right
+		if(this.p_keys[39] == true){
+			this.p_player.right();
+		}
+
+		//up
+		if(this.p_keys[38] == true){
+			this.p_player.up();
+		}
+
+		//down
+		if(this.p_keys[40] == true){
+			this.p_player.down();
+		}
+		  
+		//space
+		if(this.p_keys[32] == true){
+			this.p_player.shoot();
+		}
+	},
+	
+	getcontext: function(){
+		return this.p_ctx;
+	},
+	
+	getcanvas: function(){
+		return this.p_canv;
+	},
+	
+	updatetime: function(){
+		var d = new Date();
+		this.p_oldtime = d.getTime(); 
+	},		
+	
+	gettime: function(){
+		return this.p_oldtime;
+	},
+	
+	setcanvaspos: function(obj){
+		this.screen.x = -obj.physical.getx()+ this.getcanvas().width/2;
+		this.screen.y = -obj.physical.gety() + this.getcanvas().height/2;
+	},
+	
+	setkeycode:function(key, code){
+		this.p_keys[key] = code;
+	},
+	
+	setmousepos: function(x, y){
+		this.p_mousepos[0] = x;
+		this.p_mousepos[1] = y;
+	},
+	
+	//Higher is rolling up
+	setmouseroll: function(val){
+		this.p_mousewheel += val;
+	},
+	
+	getgravity: function(){
+		return this.p_gamegrav;
+	},
+	
+	playerkilled: function(){
+		console.log("You Died");
 	}
+};
 
-	if(playerui.gettarget() != null){map.line(updateobjects[playerui.gettarget()])};
-	
-
-	requestAnimationFrame(paint);
-
-}
+///////////////////
+///////////////////
 
 
 // for multiple keys: http://stackoverflow.com/questions/5203407/javascript-multiple-keys-pressed-at-once
-
 document.onkeydown = document.onkeyup = function(event) {
   var keyCode; 
 
@@ -140,169 +208,28 @@ document.onkeydown = document.onkeyup = function(event) {
     keyCode = event.keyCode; 
   }
 
-  keys[keyCode] = (event.type == 'keydown');
+  game.setkeycode(keyCode, (event.type == 'keydown'));
 
 }
 
 document.onmousewheel = function(event) {
-	if(map.ismapopen()){
 		//up	
 		if(event.deltaY < 0){
-			map.mousewheelin();
+			game.setmouseroll(1);
 		}
 
 		//down	
 		if(event.deltaY > 0){
-			map.mousewheelout();
+			game.setmouseroll(-1);
 		}
-	}
 }
 
 document.onmousemove = function(event) {
 
-	var bounding_box=canv.getBoundingClientRect();
-	mouseplace.x =(event.clientX - bounding_box.left) * (canv.width/bounding_box.width);        
-	mouseplace.y =(event.clientY - bounding_box.top) * (canv.height/bounding_box.height); 
+	var bounding_box= game.getcanvas().getBoundingClientRect();
+	game.setmousepos((event.clientX - bounding_box.left) * (game.getcanvas().width/bounding_box.width) , (event.clientY - bounding_box.top) * (game.getcanvas().height/bounding_box.height)); 
 
 }
-
-var map = {
-	p_screenx:0,
-	p_screeny:0,
-	p_factor:3000,
-	p_previouspress: 0,
-	p_open:0,
-	p_offsetx: 0,
-	p_offsety: 0,
-
-	pressed: function() {
-		if(keys[77] == true && this.p_previouspress === 0){
-			if(this.p_open === 1){
-				this.p_open = 0; 
-				this.p_offsetx = this.p_offsety = 0;
-				this.p_factor = 3000;
-			}else{
-				this.p_open = 1;
-			}
-			this.p_previouspress = 1;
-		}
-		if(keys[77] == false){
-			this.p_previouspress = 0 ;
-		}
-
-		return this.p_open;
-	},
-
-	draw: function() {
-		//dont draw anything if map open is 0
-		if(!this.pressed()){return false;}
-		
-		//remember the previous screen
-		this.p_screenx = screen.x;
-		this.p_screeny = screen.y;
-
-		//draw the title
-		ctx.clearRect(0, 0, canv.width, canv.height);
-		
-		//draw the ui
-		ctx.fillStyle= '#' + 'fff';		
-		ctx.fillRect(0, 0, canv.width, 40);
-		ctx.fillStyle= '#' + 'aaa';		
-		ctx.fillRect(0, 40, canv.width, 2);
-		
-		ctx.fillText("Map.",20,20);
-		
-
-		
-		//scale out
-		ctx.scale(1/this.p_factor, 1/this.p_factor);
-
-		//setup the screen x and y with offset
-		screen.x = (canv.width*this.p_factor)/2 + this.p_offsetx;
-		screen.y = (canv.height*this.p_factor)/2 + this.p_offsety;
-
-		//Calculate the mouse
-		var mouseobj = particle.create(((mouseplace.x * this.p_factor) - screen.x), ((mouseplace.y * this.p_factor) - screen.y), 0, (4 * this.p_factor));
-
-		
-		//draw the ship
-		ctx.fillStyle= '#' + '900';
-		ctx.beginPath();
-		ctx.arc(updateobjects[0].physical.getx() + screen.x, updateobjects[0].physical.gety() + screen.y, (3 * this.p_factor), 0, 2 * Math.PI);
-		ctx.fill();
-		
-		//draw everything
-		for(i = updateobjects.length - 1; i >= 0; i--) {
-			updateobjects[i].draw();
-		}
-		this.mouseover(mouseobj);	
-		
-		ctx.scale(this.p_factor, this.p_factor);
-
-		//put the offset back
-		screen.x = this.p_screenx;
-		screen.y = this.p_screeny;
-		
-	},
-	
-	mouseover: function (mouseobj) {
-		
-		for(i = updateobjects.length - 1; i >= 0; i--) {
-			if(updateobjects[i].physical.havecollided(mouseobj)){
-				if(i != 0) {playerui.settarget(i);}
-				else{playerui.settarget(null);}
-				
-				//draw mouse
-				ctx.fillStyle= "rgba(0, 255, 255, 0.4)";
-				ctx.beginPath();
-				ctx.arc(mouseobj.getx() + screen.x, mouseobj.gety() + screen.y, mouseobj.getradius(), 0, 2 * Math.PI);
-				ctx.fill();
-			}
-		}
-	},
-	
-	left: function () {
-		this.p_offsetx += this.p_factor * 10;
-	},
-
-	right: function () {
-		this.p_offsetx -= this.p_factor * 10;
-	},
-
-	up: function () {
-		this.p_offsety += this.p_factor * 10;
-	},
-
-	down: function () {
-		this.p_offsety -= this.p_factor * 10;
-	},
-
-	mousewheelin: function () {
-		this.p_factor -= 100;
-		if(this.p_factor < 200){this.p_factor = 200;}
-	},
-
-	mousewheelout: function () {
-		this.p_factor += 100;
-		if(this.p_factor > 10000000){this.p_factor = 10000000;}
-	},
-
-	ismapopen: function() {
-		return this.p_open;
-	},
-
-	line: function(obj) {
-		ctx.strokeStyle= '#' + '000';
-		ctx.lineWidth = 1;
-		ctx.beginPath();
-      		ctx.moveTo(updateobjects[0].physical.getx()+ screen.x, updateobjects[0].physical.gety()+ screen.y);
-      		ctx.lineTo(obj.physical.getx()+ screen.x, obj.physical.gety()+ screen.y);
-		ctx.stroke();
-		var dist =  Math.round(calculate_distance(updateobjects[0].physical.getx(), obj.physical.getx(), 
-			updateobjects[0].physical.gety(), obj.physical.gety()) - obj.physical.getradius());
-		ctx.fillText("Distance: " + dist,50,50);
-	}
-};
 
 //Helper Functions
 function calculate_distance(x1 , x2, y1, y2) {
@@ -311,15 +238,29 @@ function calculate_distance(x1 , x2, y1, y2) {
 		return Math.sqrt((xdist * xdist)+(ydist * ydist));
 }
 
+http://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm
+function interceptOnCircle(p1,p2,c,r){
+    //p1 is the first line point
+    //p2 is the second line point
+    //c is the circle's center
+    //r is the circle's radius
 
-//https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
-function getLineIntersection(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) {
-	var s1_x, s1_y, s2_x, s2_y;
-	s1_x = p1_x - p0_x;
-	s1_y = p1_y - p0_y;
-	s2_x = p3_x - p2_x;
-	s2_y = p3_y - p2_y;
-	var s, t;
-	s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
-	t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+    var p3 = {x:p1.x - c.x, y:p1.y - c.y} //shifted line points
+    var p4 = {x:p2.x - c.x, y:p2.y - c.y}
+
+    var m = (p4.y - p3.y) / (p4.x - p3.x); //slope of the line
+    var b = p3.y - m * p3.x; //y-intercept of line
+
+    var underRadical = Math.pow((Math.pow(r,2)*(Math.pow(m,2)+1)),2)-Math.pow(b,2); //the value under the square root sign 
+
+    if (underRadical < 0){
+    //line completely missed
+        return false;
+    } else {
+        var t1 = (-2*m*b+2*Math.sqrt(underRadical))/(2 * Math.pow(m,2) + 2); //one of the intercept x's
+        var t2 = (-2*m*b-2*Math.sqrt(underRadical))/(2 * Math.pow(m,2) + 2); //other intercept's x
+        var i1 = {x:t1,y:m*t1+b} //intercept point 1
+        var i2 = {x:t2,y:m*t2+b} //intercept point 2
+        return [i1,i2];
+    }
 }

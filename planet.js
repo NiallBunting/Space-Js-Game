@@ -15,7 +15,7 @@ var planet = {
 	orbit: function(obj){
 		this.p_orbit_object = obj;
 	
-		var velocity = (GAME_GRAVITY * (obj.physical.getmass() + this.physical.getmass()));
+		var velocity = (game.getgravity() * (obj.physical.getmass() + this.physical.getmass()));
 
 		this.p_orbit_dist = calculate_distance(obj.physical.getx() , this.physical.getx(), obj.physical.gety(), this.physical.gety());
 		
@@ -29,16 +29,17 @@ var planet = {
 
 	draw: function () {
 		this.atmosphere.draw(this.physical.getx(), this.physical.gety());
-		ctx.fillStyle= '#' + this.p_colour;
-		ctx.beginPath();
-		ctx.arc(this.physical.getx() + screen.x, this.physical.gety() + screen.y, this.physical.getradius(), 0, 2 * Math.PI);
-		ctx.fill();
+		game.getcontext().fillStyle= '#' + this.p_colour;
+		game.getcontext().beginPath();
+		game.getcontext().arc(this.physical.getx() + game.screen.x, this.physical.gety() + game.screen.y, this.physical.getradius(), 0, 2 * Math.PI);
+		game.getcontext().fill();
 	},
 
 	update: function (time) {		
 		this.keep_orbit();
 		this.physical.update(time);
-
+		
+		return 0;
 	},
 	
 	keep_orbit: function (){
@@ -81,9 +82,9 @@ var atmosphere = {
 	draw: function(x, y){
 		this.physical.setx(x);
 		this.physical.sety(y);
-		ctx.fillStyle= "rgba(200, 200, 200, 0.5)";
-		ctx.beginPath();
-		ctx.arc(this.physical.getx() + screen.x, this.physical.gety() + screen.y, this.physical.getradius(), 0, 2 * Math.PI);
-		ctx.fill();
+		game.getcontext().fillStyle= "rgba(200, 200, 200, 0.5)";
+		game.getcontext().beginPath();
+		game.getcontext().arc(this.physical.getx() + game.screen.x, this.physical.gety() + game.screen.y, this.physical.getradius(), 0, 2 * Math.PI);
+		game.getcontext().fill();
 	}
 };
