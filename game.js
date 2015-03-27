@@ -260,7 +260,7 @@ document.onmousemove = function(event) {
 }
 
 document.onclick = function(event) {
-	
+	game.setclicked();
 }
 
 //Helper Functions
