@@ -17,6 +17,8 @@ var game = {
 	p_objects: 0,
 	p_drawobjects: 0,
 	
+	p_stars: 0,
+	
 	init: function(){
 		//Variables
 		this.screen = {x: 0, y: 0};
@@ -41,6 +43,12 @@ var game = {
 		
 		//Create ui
 		this.p_ui = ui.create();
+		
+		//Creates the stars
+		this.p_stars = [];
+		for(var i = 0; i < 500; i++){
+			this.p_stars[i] = [this.getcanvas().width * Math.random(),this.getcanvas().height * Math.random(), Math.ceil(3 * Math.random())];
+		}
 		
 		requestAnimationFrame(game.loop);
 	},
@@ -120,7 +128,10 @@ var game = {
 	draw: function(){
 	
 		//clear the screen
-		this.getcontext().clearRect(0, 0, game.getcanvas().width, game.getcanvas().height);
+		this.getcontext().clearRect(0, 0, this.getcanvas().width, this.getcanvas().height);
+		
+		//draw stars
+		this.drawstars();
 		
 		//Sets the canvas pos on player
 		this.setcanvaspos(this.p_player);
@@ -132,6 +143,20 @@ var game = {
 		
 		//draw the ui
 		game.p_ui.draw();
+	},
+	
+	drawstars: function(){
+		this.p_ctx.fillStyle= '#' + 'fff';
+		
+		for(var i = 0; i < this.p_stars.length-1; i++){
+			if(this.p_stars[i][0] < this.screen.x || this.p_stars[i][0] > this.screen.x + this.getcanvas().width){
+				this.p_stars[i][0] = (this.getcanvas().width * Math.random()) + this.screen.x;
+			}
+			if(this.p_stars[i][1] < this.screen.y || this.p_stars[i][1] > this.screen.y + this.getcanvas().height){
+				this.p_stars[i][1] = (this.getcanvas().width * Math.random()) + this.screen.y;
+			}
+			this.p_ctx.fillRect(this.p_stars[i][0] - this.screen.x, this.p_stars[i][1] -this.screen.y, this.p_stars[i][2], this.p_stars[i][2]);
+		}
 	},
 	
 	keypresses: function(){

@@ -37,7 +37,7 @@ var ui = {
 	draw: function(){
 		
 		if(!this.p_displayopen){
-			game.getcontext().fillStyle= '#000';
+			game.getcontext().fillStyle= '#0f0';
 			game.getcontext().fillText("Hp: "+ Math.ceil(game.getplayer().gethp()) + " Armour: " + Math.ceil(game.getplayer().getarmour()) ,10,20);
 			game.getcontext().fillText("Speed: " + Math.ceil(game.getplayer().physical.getspeed()) + " Fuel: " + Math.ceil(game.getplayer().getfuel()),10,40);
 			game.getcontext().fillText(game.getplayer().weapon.gettype(),10,60);
