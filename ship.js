@@ -22,7 +22,7 @@ var ship = {
 		 //12680000
 		obj.physical = particle.create("ship", 0, 17590000, 10, 10);
 		obj.weapon = weapon.create("machinegun", 50, 200, 500, 4000, 300, 20, 0.9);
-		obj.ship = ship;
+		obj.ship = obj;
 		return obj;
 	},
 	
@@ -204,7 +204,8 @@ var weapon = {
 		
 		var closestobj = {dist: 10000000000, obj: 0};
 		
-		for(i = game.p_objects.length - 1; i >= 0; i--) {
+		for(var i = 16 - 1; i >= 0; i--) {
+			if(typeof game.p_objects[i] === 'undefined'){continue;}
 			if(game.p_objects[i].physical.gettype() != "ship"){continue;}
 
 			var object = {x: game.p_objects[i].physical.getx(), y: game.p_objects[i].physical.gety()};

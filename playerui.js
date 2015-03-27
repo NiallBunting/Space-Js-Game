@@ -4,7 +4,7 @@ var ui = {
 	
 	create: function(){
 		var obj = Object.create(this);
-		//obj.display = leftdisplay.create();
+		obj.display = leftdisplay.create();
 		return obj;
 	},
 	
@@ -17,7 +17,9 @@ var ui = {
 	},
 	
 	keys: function(keys){
-		
+		if(keys[77] == true){
+			
+		}
 	},
 	
 	mousewheel: function(wheel){

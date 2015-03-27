@@ -42,7 +42,7 @@ var game = {
 		//Create ui
 		this.p_ui = ui.create();
 		
-		requestAnimationFrame(game.draw);
+		requestAnimationFrame(game.loop);
 	},
 	
 	resizecanvas: function(){
@@ -68,6 +68,19 @@ var game = {
 		
 		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
 		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+	},
+	
+	loop: function(){
+		game.update();
+		game.draw();
+		requestAnimationFrame(game.loop);
 	},
 	
 	update: function(){
@@ -105,24 +118,20 @@ var game = {
 	},
 	
 	draw: function(){
-
-		game.update();
 	
 		//clear the screen
-		game.getcontext().clearRect(0, 0, game.getcanvas().width, game.getcanvas().height);
+		this.getcontext().clearRect(0, 0, game.getcanvas().width, game.getcanvas().height);
 		
 		//Sets the canvas pos on player
-		game.setcanvaspos(game.p_player);
+		this.setcanvaspos(this.p_player);
 	
 		//Draw all the objects
-		for(i = game.p_objects.length - 1; i >= 0; i--) {
-			game.p_objects[i].draw();
+		for(i = this.p_objects.length - 1; i >= 0; i--) {
+			this.p_objects[i].draw();
 		}
 		
 		//draw the ui
 		game.p_ui.draw();
-		
-		requestAnimationFrame(game.draw);
 	},
 	
 	keypresses: function(){
@@ -196,9 +205,8 @@ var game = {
 	
 	setclicked: function(){
 		this.p_mouseclick = {};
-		this.p_mouseclick.x = this.mousepos.x;
-		this.p_mouseclick.y = this.mousepos.y;
-		
+		this.p_mouseclick.x = this.p_mousepos.x;
+		this.p_mouseclick.y = this.p_mousepos.y;
 		this.p_ui.click(this.p_mouseclick);
 	},
 	
