@@ -4,16 +4,25 @@ var ship = {
 	// power forward, back, left, right
 	p_power: [10 , -3, -0.01, 0.01],
 	p_spin: 0,
+	p_hpregenamount: 0.002,
+	p_hpregencumative: 0,
+	p_maxhpregen: 0.8,
+	
+	p_maxhp: 100,
 	p_hp: 100,
-	p_armour: 0,
+	p_armour: 50,
 	//Status: 0 fine, 9 destroyed
 	p_status: 0,
+	p_fuel: 1000,
+	// One means completly random, any number higher adds a minimum
+	p_armourpower: 1,
 
 	create: function(){
 		var obj = Object.create(this);
 		 //12680000
 		obj.physical = particle.create("ship", 0, 17590000, 10, 10);
-		obj.weapon = weapon.create("machinegun", 50, 75, 500, 4000, 300, 20, 0.9);
+		obj.weapon = weapon.create("machinegun", 50, 200, 500, 4000, 300, 20, 0.9);
+		obj.ship = ship;
 		return obj;
 	},
 	
@@ -23,6 +32,17 @@ var ship = {
 		if(this.p_direction > Math.PI){this.p_direction = -Math.PI;}
 		if(this.p_direction < -Math.PI){this.p_direction = Math.PI;}
 		if(this.p_hp <= 0){this.destroy();}
+		
+		//If hp is less than max
+		if((this.p_hp + 1) < (this.p_maxhp * this.p_maxhpregen)){
+			//add the regen amount
+			this.p_hpregencumative += this.p_hpregenamount;
+			//If reached one add it back on
+			if(this.p_hpregencumative >= 1){
+				this.p_hp++;
+				this.p_hpregencumative = 0;
+			}
+		}
 		
 		return this.p_status;
 	},
@@ -46,18 +66,22 @@ var ship = {
 
 	left: function(){
 		this.spin(false);
+		this.removefuel(this.p_power[2]);
 	},
 
 	right: function(){
 		this.spin(true);
+		this.removefuel(this.p_power[3]);
 	},
 
 	up: function(){
 		this.forward(this.p_power[0]);
+		this.removefuel(this.p_power[0]);
 	},
 
 	down: function(){
 		this.forward(this.p_power[1]);
+		this.removefuel(this.p_power[1]);
 	},
 	
 	spin: function(right){
@@ -87,30 +111,46 @@ var ship = {
 		this.p_status = 9;
 	},
 	
-	damage: function(damage){
-		var armoureffect = Math.min(((Math.random() * 0.5) * damage), this.p_armour);
-		
+	damage: function(damage){		
+		var armoureffect = Math.min(((Math.random() * (1/this.p_armourpower))  + ((this.p_armourpower - 1)/this.p_armourpower)) * this.p_armour, damage);
+
 		this.p_armour -= armoureffect;
 		this.p_hp -= (damage - armoureffect);
 
+	},
+	
+	gethp: function(){
+		return this.p_hp;
+	},
+	
+	getarmour: function(){
+		return this.p_armour;
+	},
+	
+	getfuel: function(){
+		return this.p_fuel;
+	},
+	
+	removefuel: function(power){
+		this.p_fuel -= (Math.abs(power)/100);
 	}
 };
 
 var weapon = {
-	p_type: 0, //Weapon Type
+	p_type: 0, //Weapon Type (machinegun, laser, rocket, sniper)
 	p_magrounds: 0, // Rounds in magazine
 	p_firetime: 0, // Time betweenshots
 	p_ammo: 0, // Total ammo
 	p_reloadtime: 0, // reload time
 	p_maxdistance: 0, //distance rounds fires
-	p_power: 0,
-	p_accuraccy: 0,
-	p_draw: 0,
+	p_power: 0, //damage
+	p_accuraccy: 0, //accuraccy
+	p_draw: 0, // internal draw varible
 	
 	p_currentmag: 0, //Players mag ammo
 	p_currentammo: 0, // Players ammo
 	p_currentreloadreadytime: 0, //If time is after this then ready
-	p_currentshootagaintime: 0,
+	p_currentshootagaintime: 0, //time till they can shoot again
 	
 	create: function(type, magrounds, firetime, ammo, reloadtime, maxdistance, power, accuraccy){
 		var obj = Object.create(this);
@@ -132,7 +172,7 @@ var weapon = {
 			game.getcontext().fillStyle= '#' + 'fff';
 			game.getcontext().beginPath();
 			game.getcontext().moveTo(ship.physical.getx() + game.screen.x + (ship.physical.getradius() * Math.cos(ship.p_direction)) , ship.physical.gety() + game.screen.y + (ship.physical.getradius() * Math.sin(ship.p_direction)));
-			game.getcontext().lineTo(game.screen.x + this.p_draw.physical.getx(), game.screen.y + this.p_draw.physical.gety());
+			game.getcontext().lineTo(game.screen.x + this.p_draw.x, game.screen.y + this.p_draw.y);
 			game.getcontext().stroke();
 			
 			this.p_draw = 0;
@@ -158,87 +198,91 @@ var weapon = {
 		this.p_currentmag--;
 		
 		//Needs to do do damage
-		var shipx = ship.physical.getx() + (ship.physical.getradius() * Math.cos(ship.p_direction));
-		var shipy = ship.physical.gety() + (ship.physical.getradius() * Math.sin(ship.p_direction));
-		var xshot = ship.physical.getx() + (this.p_maxdistance * (Math.cos(ship.p_direction) + this.accuracyeffect()));
-		var yshot = ship.physical.gety() + (this.p_maxdistance * (Math.sin(ship.p_direction) + this.accuracyeffect()));
+		var shipf = {x: ship.physical.getx() + (ship.physical.getradius() * Math.cos(ship.p_direction)), y: ship.physical.gety() + (ship.physical.getradius() * Math.sin(ship.p_direction))};
+		var shot = {x: ship.physical.getx() + (this.p_maxdistance * (Math.cos(ship.p_direction) + this.accuracyeffect())), y:ship.physical.gety() + (this.p_maxdistance * (Math.sin(ship.p_direction) + this.accuracyeffect()))};
+		this.p_draw = {x: shot.x, y:shot.y};
 		
+		var closestobj = {dist: 10000000000, obj: 0};
 		
-	
-		
-		var p1 = {x:shipx, y:shipy};
-		
-		var p2 = {x:xshot, y:yshot};
-		
-		var resultcordinates = false;
-		var resultobject = null;
 		for(i = game.p_objects.length - 1; i >= 0; i--) {
-			if(game.p_objects[i].physical.gettype() == "ship" && game.p_objects[i].physical != ship.physical){
-				var c = {x: game.p_objects[i].physical.getx(), y:game.p_objects[i].physical.gety()};
+			if(game.p_objects[i].physical.gettype() != "ship"){continue;}
 
-				var tempresult = interceptOnCircle(p1, p2, c, game.p_objects[i].physical.getradius());
-				
-				if(tempresult != false){
-					if(resultcordinates == false){resultcordinates = tempresult; resultobject = game.p_objects[i];}
-					else{
-						var currentdist = calculate_distance(shipx , resultcordinates[0], shipy, resultcordinates[1]);
-						var newdist = calculate_distance(shipx , tempresult[0], shipy, tempresult[1]);
-						
-						if(newdist < currentdist){
-							resultcordinates = tempresult; 
-							resultobject = game.p_objects[i];
-						}
-					}
+			var object = {x: game.p_objects[i].physical.getx(), y: game.p_objects[i].physical.gety()};
+			
+			
+			//Tests if the ship is within the distance the ship can shoot
+			if(calculate_distance(shipf.x, object.x, shipf.y, object.y) > calculate_distance(shipf.x, shot.x, shipf.y, shot.y)){continue;}
+			//Now tests if the ship is within the circle of the endpoint
+			if(calculate_distance(shipf.x, shot.x, shipf.y, shot.y) < calculate_distance(object.x, shot.x, object.y, shot.y)){continue;}
+			
+			//https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line - based off
+			//However this does not check that its on the right side so above check avoids that
+			var dist = Math.abs(((((shot.y - shipf.y) * object.x) - ((shot.x - shipf.x) * object.y)) + (shot.x * shipf.y)) - (shot.y * shipf.x)) / Math.sqrt(Math.pow((shot.y - shipf.y), 2) + Math.pow((shot.x - shipf.x) , 2));
+
+			var damage = (Math.random() * (this.p_power/2)) + (this.p_power/2);
+			if(dist < game.p_objects[i].physical.getradius()){
+				var tempdist = calculate_distance(shipf.x, object.x, shipf.y, object.y);
+				if(tempdist < closestobj.dist){
+					closestobj.dist = tempdist;
+					closestobj.obj = game.p_objects[i];
 				}
 			}
 		}
 		
+		if(closestobj.obj != 0){
+			this.p_draw = {x: closestobj.obj.physical.getx(), y:closestobj.obj.physical.gety()}; 
+			closestobj.obj.ship.damage(damage);
+		}
 		
-		console.log(resultcordinates[0]);
-		console.log(resultcordinates[1]		);
-		console.log( resultobject);
-		
-		//Draws the round
-		if(Math.random() > 0 && resultobject != null){this.p_draw = resultobject;}
 	},
 	
 	reload: function(){
-		//Checks if time is up and ammo is 0 to refill
-		if(game.gettime() < this.p_currentreloadreadytime && this.p_currentmag == 0){
-			if(this.p_currentammo >= this.p_magrounds){
-				this.p_currentmag = this.p_magrounds;
-				this.p_currentammo -= this.p_magrounds;
-			}
-			else{
-				if(this.p_currentammo > 0){
-					this.p_currentmag = this.p_currentammo;
-					this.p_currentammo = 0;
-				}
-				else{
-					return 0;
-				}
-			}
-			return 1;
-		}
-				
-		//Checks if still reloading
+		
+		//This would mean its still reloading.
 		if(game.gettime() <= this.p_currentreloadreadytime){
 			return 0;
 		}
 		
-		//Out of ammo so reloads
-		if(this.p_currentmag <= 0){
+		//means a reload is needed as no ammo
+		if(this.p_currentmag == 1){
 			this.p_currentreloadreadytime = game.gettime() + this.p_reloadtime;
-			return 0;
+			this.p_currentmag = 0;
+			return 1;
+		}
+		
+		//times past and reload can happen
+		if(this.p_currentmag <= 0){
+			var amountofrounds = Math.min(this.p_currentammo, this.p_magrounds);
+ 
+			this.p_currentmag = amountofrounds;
+			this.p_currentammo -= amountofrounds;
+			
+			if(this.p_currentmag == 0){
+				return 0;
+			}
 		}
 		
 		return 1;
 		
 	},
 	
+	manualreload: function(){
+		this.p_currentammo += this.p_currentmag;
+		this.p_currentmag = 0;
+		this.p_currentreloadreadytime = game.gettime() + this.p_reloadtime;
+	},
+	
 	accuracyeffect: function(){
 		var accuracytop = (1 - this.p_accuraccy);
 		var accuracybottom = 0 - (1 - this.p_accuraccy);
 		return ((Math.random() * accuracytop * 2) + accuracybottom);
+	},
+	
+	gettype: function(){
+		return this.p_type;
+	},
+	
+	getammo: function(){
+		return this.p_currentmag + "/" + this.p_currentammo;
 	}
 }

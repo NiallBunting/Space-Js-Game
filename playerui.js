@@ -1,22 +1,67 @@
-var leftdisplay = {
+var ui = {
+	
+	p_displayopen: false,
+	
+	create: function(){
+		var obj = Object.create(this);
+		//obj.display = leftdisplay.create();
+		return obj;
+	},
+	
+	click: function(click){
+	
+	},
+	
+	mousepos: function(pos){
+		
+	},
+	
+	keys: function(keys){
+		
+	},
+	
+	mousewheel: function(wheel){
+		
+	},
+	
+	isdisplayopen: function(){
+		this.p_displayopen;
+	},
+	
+	update: function(){
+		
+	},
+	
+	draw: function(){
+		
+		if(!this.p_displayopen){
+			game.getcontext().fillStyle= '#000';
+			game.getcontext().fillText("Hp: "+ Math.ceil(game.getplayer().gethp()) + " Armour: " + Math.ceil(game.getplayer().getarmour()) ,10,20);
+			game.getcontext().fillText("Speed: " + Math.ceil(game.getplayer().physical.getspeed()) + " Fuel: " + Math.ceil(game.getplayer().getfuel()),10,40);
+			game.getcontext().fillText(game.getplayer().weapon.gettype(),10,60);
+			game.getcontext().fillText(game.getplayer().weapon.getammo(),10,80);
+		}
+	}
+	
+};
 
-	p_target: null,
-
+var playerui = {
+	
 	create: function(){
 		var obj = Object.create(this);
 		return obj;
 	},
-
-	gettarget: function (){
-		return this.p_target;
-	},
 	
-	settarget: function (id) {
-		this.p_target = id;
-	}
-
 };
 
+var leftdisplay = {	
+	create: function(){
+		var obj = Object.create(this);
+		return obj;
+	},
+};
+
+/*
 var map = {
 	p_screenx:0,
 	p_screeny:0,
@@ -154,3 +199,4 @@ var map = {
 		ctx.fillText("Distance: " + dist,50,50);
 	}
 };
+*/

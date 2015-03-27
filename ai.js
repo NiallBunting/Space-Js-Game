@@ -13,7 +13,7 @@ var shipai = {
 		var obj = Object.create(this);
 		obj.ship = ship.create();
 		obj.physical = obj.ship.physical;
-		obj.physical.setx((100 * Math.random()) - 50);
+		obj.physical.setx((1000 * Math.random()));
 		obj.p_player = player;
 		return obj;
 	},

@@ -8,6 +8,10 @@ var game = {
 	p_keys: 0,
 	p_mousewheel: 0,
 	p_mousepos: 0,
+	p_mouseclick: 0,
+	
+	//
+	p_ui:0,
 	
 	p_player: 0,
 	p_objects: 0,
@@ -15,9 +19,7 @@ var game = {
 	
 	init: function(){
 		//Variables
-		this.screen = {};
-		this.screen.x = 0;
-		this.screen.y = 0;
+		this.screen = {x: 0, y: 0};
 		this.p_keys = [];
 		this.p_mousepos = [];
 		this.p_gamegrav = C_GAME_GRAVITY;
@@ -37,10 +39,9 @@ var game = {
 		//Creates the player and the planets
 		this.createuniverse();
 		
-		//for(var i = 0; i < 10000; i++){
-		//	this.update();
-		//	this.draw();
-		//}
+		//Create ui
+		this.p_ui = ui.create();
+		
 		requestAnimationFrame(game.draw);
 	},
 	
@@ -66,7 +67,7 @@ var game = {
 		}
 		
 		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-		//this.p_objects[this.p_objects.length] = shipai.create(this.p_objects[this.p_objects.length - 1]);
+		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
 	},
 	
 	update: function(){
@@ -78,6 +79,8 @@ var game = {
 		this.updatetime();
 		var updatetime = (this.gettime() - oldtime)/100;
 		updatetime = (updatetime > this.p_maxtimeout) ? this.p_maxtimeout : updatetime;
+		
+		this.p_ui.update();
 		
 		//Updates gravity and collisions
 		for(i = 0; i < this.p_objects.length; i++) {
@@ -116,33 +119,44 @@ var game = {
 			game.p_objects[i].draw();
 		}
 		
+		//draw the ui
+		game.p_ui.draw();
+		
 		requestAnimationFrame(game.draw);
 	},
 	
 	keypresses: function(){
-		//left
-		if(this.p_keys[37] == true){
-			this.p_player.left();
-		}
+		
+		if(!this.p_ui.isdisplayopen()){
+			//left
+			if(this.p_keys[37] == true || this.p_keys[65] == true){
+					this.p_player.left();
+			}
 
-		//right
-		if(this.p_keys[39] == true){
-			this.p_player.right();
-		}
+			//right
+			if(this.p_keys[39] == true || this.p_keys[68] == true){
+				this.p_player.right();
+			}
 
-		//up
-		if(this.p_keys[38] == true){
-			this.p_player.up();
-		}
+			//up
+			if(this.p_keys[38] == true || this.p_keys[87] == true){
+				this.p_player.up();
+			}
 
-		//down
-		if(this.p_keys[40] == true){
-			this.p_player.down();
-		}
-		  
-		//space
-		if(this.p_keys[32] == true){
-			this.p_player.shoot();
+			//down
+			if(this.p_keys[40] == true || this.p_keys[83] == true){
+				this.p_player.down();
+			}
+			  
+			//space
+			if(this.p_keys[32] == true){
+				this.p_player.shoot();
+			}
+			
+			//reload
+			if(this.p_keys[82] == true){
+				this.p_player.weapon.manualreload();
+			}
 		}
 	},
 	
@@ -170,16 +184,29 @@ var game = {
 	
 	setkeycode:function(key, code){
 		this.p_keys[key] = code;
+		
+		this.p_ui.keys(this.p_keys);
 	},
 	
-	setmousepos: function(x, y){
-		this.p_mousepos[0] = x;
-		this.p_mousepos[1] = y;
+	setmousepos: function(newx, newy){
+		this.p_mousepos = {x: newx, y: newy};
+		
+		this.p_ui.mousepos(this.p_mousepos);
+	},
+	
+	setclicked: function(){
+		this.p_mouseclick = {};
+		this.p_mouseclick.x = this.mousepos.x;
+		this.p_mouseclick.y = this.mousepos.y;
+		
+		this.p_ui.click(this.p_mouseclick);
 	},
 	
 	//Higher is rolling up
 	setmouseroll: function(val){
 		this.p_mousewheel += val;
+		
+		this.p_ui.mousewheel(this.p_mousewheel);
 	},
 	
 	getgravity: function(){
@@ -188,6 +215,10 @@ var game = {
 	
 	playerkilled: function(){
 		console.log("You Died");
+	},
+	
+	getplayer: function(){
+		return this.p_player;
 	}
 };
 
@@ -207,9 +238,8 @@ document.onkeydown = document.onkeyup = function(event) {
   {
     keyCode = event.keyCode; 
   }
-
+//console.log(keyCode);
   game.setkeycode(keyCode, (event.type == 'keydown'));
-
 }
 
 document.onmousewheel = function(event) {
@@ -225,10 +255,12 @@ document.onmousewheel = function(event) {
 }
 
 document.onmousemove = function(event) {
-
 	var bounding_box= game.getcanvas().getBoundingClientRect();
 	game.setmousepos((event.clientX - bounding_box.left) * (game.getcanvas().width/bounding_box.width) , (event.clientY - bounding_box.top) * (game.getcanvas().height/bounding_box.height)); 
+}
 
+document.onclick = function(event) {
+	
 }
 
 //Helper Functions
@@ -236,31 +268,4 @@ function calculate_distance(x1 , x2, y1, y2) {
 		var xdist = x1 - x2;
 		var ydist = y1 - y2;
 		return Math.sqrt((xdist * xdist)+(ydist * ydist));
-}
-
-http://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm
-function interceptOnCircle(p1,p2,c,r){
-    //p1 is the first line point
-    //p2 is the second line point
-    //c is the circle's center
-    //r is the circle's radius
-
-    var p3 = {x:p1.x - c.x, y:p1.y - c.y} //shifted line points
-    var p4 = {x:p2.x - c.x, y:p2.y - c.y}
-
-    var m = (p4.y - p3.y) / (p4.x - p3.x); //slope of the line
-    var b = p3.y - m * p3.x; //y-intercept of line
-
-    var underRadical = Math.pow((Math.pow(r,2)*(Math.pow(m,2)+1)),2)-Math.pow(b,2); //the value under the square root sign 
-
-    if (underRadical < 0){
-    //line completely missed
-        return false;
-    } else {
-        var t1 = (-2*m*b+2*Math.sqrt(underRadical))/(2 * Math.pow(m,2) + 2); //one of the intercept x's
-        var t2 = (-2*m*b-2*Math.sqrt(underRadical))/(2 * Math.pow(m,2) + 2); //other intercept's x
-        var i1 = {x:t1,y:m*t1+b} //intercept point 1
-        var i2 = {x:t2,y:m*t2+b} //intercept point 2
-        return [i1,i2];
-    }
 }
