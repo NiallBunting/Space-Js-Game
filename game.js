@@ -46,7 +46,7 @@ var game = {
 		
 		//Creates the stars
 		this.p_stars = [];
-		for(var i = 0; i < 500; i++){
+		for(var i = 0; i < 50; i++){
 			this.p_stars[i] = [this.getcanvas().width * Math.random(),this.getcanvas().height * Math.random(), Math.ceil(3 * Math.random())];
 		}
 		
@@ -76,13 +76,12 @@ var game = {
 		
 		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
 		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+				this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+						this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+								this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+										this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+												this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+				this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
 	},
 	
 	loop: function(){
@@ -148,14 +147,19 @@ var game = {
 	drawstars: function(){
 		this.p_ctx.fillStyle= '#' + 'fff';
 		
+		var screenx = -this.screen.x;
+		var screeny = -this.screen.y;
+		
 		for(var i = 0; i < this.p_stars.length-1; i++){
-			if(this.p_stars[i][0] < this.screen.x || this.p_stars[i][0] > this.screen.x + this.getcanvas().width){
-				this.p_stars[i][0] = (this.getcanvas().width * Math.random()) + this.screen.x;
+			if(this.p_stars[i][0] < screenx || this.p_stars[i][0] > screenx + this.getcanvas().width){
+				this.p_stars[i][0] = Math.random() > 0.5 ? (this.getcanvas().width - 5) + screenx : 5 + screenx;
+				this.p_stars[i][1] = (this.getcanvas().height * Math.random()) + screeny;
 			}
-			if(this.p_stars[i][1] < this.screen.y || this.p_stars[i][1] > this.screen.y + this.getcanvas().height){
-				this.p_stars[i][1] = (this.getcanvas().width * Math.random()) + this.screen.y;
+			if(this.p_stars[i][1] < screeny || this.p_stars[i][1] > screeny + this.getcanvas().height){
+				this.p_stars[i][0] = (this.getcanvas().width * Math.random()) + screenx;
+				this.p_stars[i][1] = Math.random() > 0.5 ? (this.getcanvas().height - 5) + screeny : 5 + screeny;
 			}
-			this.p_ctx.fillRect(this.p_stars[i][0] - this.screen.x, this.p_stars[i][1] -this.screen.y, this.p_stars[i][2], this.p_stars[i][2]);
+			this.p_ctx.fillRect(this.p_stars[i][0] + this.screen.x, this.p_stars[i][1] + this.screen.y, this.p_stars[i][2], this.p_stars[i][2]);
 		}
 	},
 	
