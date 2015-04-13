@@ -103,8 +103,8 @@ var game = {
 		this.p_ui.update();
 		
 		//Updates gravity and collisions
-		for(i = 0; i < this.p_objects.length; i++) {
-			for(j = 0; j < this.p_objects.length; j++) {
+		for(var i = 0; i < this.p_objects.length; i++) {
+			for(var j = 0; j < this.p_objects.length; j++) {
     			if(i == j){continue;}
 				this.p_objects[i].physical.gravity(this.p_objects[j].physical, updatetime, 1);
 				this.p_objects[i].collided(this.p_objects[j].physical, updatetime);
@@ -112,7 +112,7 @@ var game = {
 		}
 		
 		//Updates the positions
-		for(i = 0; i < this.p_objects.length; i++) {
+		for(var i = 0; i < this.p_objects.length; i++) {
 			var val = this.p_objects[i].update(updatetime);
 			if (val == 9){
 				if(this.p_objects[i] == this.p_player){
@@ -136,7 +136,7 @@ var game = {
 		this.setcanvaspos(this.p_player);
 	
 		//Draw all the objects
-		for(i = this.p_objects.length - 1; i >= 0; i--) {
+		for(var i = this.p_objects.length - 1; i >= 0; i--) {
 			this.p_objects[i].draw();
 		}
 		

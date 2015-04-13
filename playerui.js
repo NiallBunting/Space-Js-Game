@@ -5,6 +5,7 @@ var ui = {
 	create: function(){
 		var obj = Object.create(this);
 		obj.display = leftdisplay.create();
+		obj.minimap = minimap.create();
 		return obj;
 	},
 	
@@ -17,8 +18,10 @@ var ui = {
 	},
 	
 	keys: function(keys){
+		// The M key
 		if(keys[77] == true){
-			
+			this.p_displayopen = true;
+			this.display.mappress();
 		}
 	},
 	
@@ -31,7 +34,7 @@ var ui = {
 	},
 	
 	update: function(){
-		
+		this.minimap.update();
 	},
 	
 	draw: function(){
@@ -42,18 +45,34 @@ var ui = {
 			game.getcontext().fillText("Speed: " + Math.ceil(game.getplayer().physical.getspeed()) + " Fuel: " + Math.ceil(game.getplayer().getfuel()),10,40);
 			game.getcontext().fillText(game.getplayer().weapon.gettype(),10,60);
 			game.getcontext().fillText(game.getplayer().weapon.getammo(),10,80);
+			
+			this.minimap.draw();
+		}else{
+			this.display.draw();
 		}
 	}
 	
 };
 
-var playerui = {
-	
+var minimap = {
 	create: function(){
 		var obj = Object.create(this);
 		return obj;
 	},
 	
+	update: function(){
+		for(var i = 0; i < game.p_objects.length; i++) {
+				 if(game.p_objects[i] == game.getplayer()){continue;}
+				// calculate_distance(x1 , x2, y1, y2)
+				 //If distance is less than 200,000
+				 //Draw a dot on the minimap
+				 //the minimap needs to be shrunk
+		}
+	},
+	
+	draw: function(){
+		
+	}
 };
 
 var leftdisplay = {	
@@ -61,6 +80,14 @@ var leftdisplay = {
 		var obj = Object.create(this);
 		return obj;
 	},
+	
+	draw: function(){
+		
+	},
+	
+	mappress: function(){
+		
+	}
 };
 
 /*

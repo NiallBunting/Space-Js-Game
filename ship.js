@@ -63,7 +63,6 @@ var ship = {
 		this.weapon.draw(this);
 	},
 
-
 	left: function(){
 		this.spin(false);
 		this.removefuel(this.p_power[2]);
@@ -204,7 +203,7 @@ var weapon = {
 		
 		var closestobj = {dist: 10000000000, obj: 0};
 		
-		for(var i = 16 - 1; i >= 0; i--) {
+		for(var i = game.p_objects.length - 1; i >= 0; i--) {
 			if(typeof game.p_objects[i] === 'undefined'){continue;}
 			if(game.p_objects[i].physical.gettype() != "ship"){continue;}
 
