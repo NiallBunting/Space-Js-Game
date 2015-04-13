@@ -22,7 +22,10 @@ var ui = {
 		if(keys[77] == true){
 			this.p_displayopen = true;
 			this.display.mappress();
+		}else{
+			this.p_displayopen = false;
 		}
+		
 	},
 	
 	mousewheel: function(wheel){
@@ -34,7 +37,6 @@ var ui = {
 	},
 	
 	update: function(){
-		this.minimap.update();
 	},
 	
 	draw: function(){
@@ -60,18 +62,27 @@ var minimap = {
 		return obj;
 	},
 	
-	update: function(){
-		for(var i = 0; i < game.p_objects.length; i++) {
-				 if(game.p_objects[i] == game.getplayer()){continue;}
-				// calculate_distance(x1 , x2, y1, y2)
-				 //If distance is less than 200,000
-				 //Draw a dot on the minimap
-				 //the minimap needs to be shrunk
-		}
-	},
-	
-	draw: function(){
+	draw: function(){					
+		var scale = (game.getplayer().physical.getspeed() * 5) + 100;
+		game.getcontext().scale(1/scale, 1/scale);
+		game.getcontext().fillStyle= '#fff';
+		game.getcontext().beginPath();
+		game.getcontext().arc((game.getcanvas().width - 100) * scale, (game.getcanvas().height - 100) * scale , 100 * scale, 0, 2 * Math.PI);
+		game.getcontext().fill();
 		
+		for(var i = 0; i < game.p_objects.length; i++) {
+			// if(game.p_objects[i] == game.getplayer()){continue;}
+			if(calculate_distance(game.p_objects[i].physical.getx() , game.getplayer().physical.getx(), game.p_objects[i].physical.gety(), game.getplayer().physical.gety()) < (99 * scale)){
+
+				game.getcontext().fillStyle= '#333';
+				game.getcontext().beginPath();
+				game.getcontext().arc(((game.getcanvas().width - 100) * scale) + (game.p_objects[i].physical.getx() - game.getplayer().physical.getx()), ((game.getcanvas().height - 100) * scale) + (game.p_objects[i].physical.gety() - game.getplayer().physical.gety()), scale * 2, 0, 2 * Math.PI);
+				game.getcontext().fill();
+
+			}
+		}
+		
+		game.getcontext().scale(scale, scale);
 	}
 };
 

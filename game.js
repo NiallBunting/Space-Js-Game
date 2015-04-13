@@ -13,7 +13,7 @@ var game = {
 	//
 	p_ui:0,
 	
-	p_player: 0,
+	p_player: 0,   
 	p_objects: 0,
 	p_drawobjects: 0,
 	
