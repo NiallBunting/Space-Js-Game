@@ -23,7 +23,7 @@ var planet = {
 		
 		velocity = Math.sqrt(velocity * 0.1);
 
-		this.physical.setvelocity(velocity, 0);
+		//this.physical.setvelocity(velocity, 0);
 
 	},
 
@@ -73,7 +73,7 @@ var atmosphere = {
 	
 	create: function(radius){
 		var obj = Object.create(this);
-		obj.physical = particle.create(0, 0, 200, radius);
+		obj.physical = particle.create("atmosphere", 0, 0, 200, radius);
 		obj.p_radius = radius;
 		obj.physical.setdensity(0.01);
 		return obj;

@@ -75,13 +75,6 @@ var game = {
 		}
 		
 		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-				this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-						this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-								this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-										this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-												this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
-				this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
 	},
 	
 	loop: function(){

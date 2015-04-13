@@ -95,7 +95,13 @@ var ship = {
 	},
 	
 	collided: function(obj){
-		this.physical.collided(obj);
+
+		if(this.physical.havecollided(obj)){		
+			//Does damage equal to this value
+			this.damage(calculate_distance(this.physical.getxspeed(), obj.getxspeed(), this.physical.getyspeed(), obj.getyspeed()));
+			
+			this.physical.collided(obj);
+		}
 	},
 	
 	getrotation: function(){
