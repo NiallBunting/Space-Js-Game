@@ -62,17 +62,24 @@ var minimap = {
 		return obj;
 	},
 	
-	draw: function(){					
+	draw: function(){	
+		var size = 80;				
 		var scale = (game.getplayer().physical.getspeed() * 5) + 100;
 		game.getcontext().scale(1/scale, 1/scale);
-		game.getcontext().fillStyle= '#fff';
+		game.getcontext().fillStyle= "rgba(255, 255, 255, 0.5)";
 		game.getcontext().beginPath();
-		game.getcontext().arc((game.getcanvas().width - 100) * scale, (game.getcanvas().height - 100) * scale , 100 * scale, 0, 2 * Math.PI);
+		game.getcontext().arc((game.getcanvas().width - 100) * scale, (game.getcanvas().height - 100) * scale , size * scale, 0, 2 * Math.PI);
 		game.getcontext().fill();
+		game.getcontext().lineWidth = 4 * scale;
+		game.getcontext().strokeStyle = "rgba(255, 255, 255, 0.8)";
+		game.getcontext().stroke();
+
+
+
 		
 		for(var i = 0; i < game.p_objects.length; i++) {
 			// if(game.p_objects[i] == game.getplayer()){continue;}
-			if(calculate_distance(game.p_objects[i].physical.getx() , game.getplayer().physical.getx(), game.p_objects[i].physical.gety(), game.getplayer().physical.gety()) < (99 * scale)){
+			if(calculate_distance(game.p_objects[i].physical.getx() , game.getplayer().physical.getx(), game.p_objects[i].physical.gety(), game.getplayer().physical.gety()) < ((size - 1) * scale)){
 
 				game.getcontext().fillStyle= '#333';
 				game.getcontext().beginPath();
@@ -83,6 +90,7 @@ var minimap = {
 		}
 		
 		game.getcontext().scale(scale, scale);
+
 	}
 };
 

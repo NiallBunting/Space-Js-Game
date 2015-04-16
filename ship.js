@@ -173,7 +173,7 @@ var weapon = {
 	
 	draw: function(ship){
 		if(this.p_draw != 0){
-		
+			game.getcontext().lineWidth = 1;
 			game.getcontext().strokeStyle= '#' + 'ddb';
 			game.getcontext().beginPath();
 			game.getcontext().moveTo(ship.physical.getx() + game.screen.x + (ship.physical.getradius() * Math.cos(ship.p_direction)) , ship.physical.gety() + game.screen.y + (ship.physical.getradius() * Math.sin(ship.p_direction)));

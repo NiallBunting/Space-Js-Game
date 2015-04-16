@@ -7,7 +7,7 @@ var planet = {
 	create: function(x, y, mass, width, colour){
 		var obj = Object.create(this);
 		obj.physical = particle.create("planet", x, y, mass, width);
-		obj.atmosphere = atmosphere.create(width + 1000);
+		obj.atmosphere = atmosphere.create(width, 2000);
 		obj.p_colour = colour;
 		return obj;
 	},
@@ -70,9 +70,12 @@ var atmosphere = {
 	p_colour: 0,
 	p_weather: 0,
 	p_radius: 10,
+	p_atmospheresize: 0,
 	
-	create: function(radius){
+	create: function(radius, atmospheresize){
+		radius += atmospheresize;
 		var obj = Object.create(this);
+		obj.p_atmospheresize = atmospheresize;
 		obj.physical = particle.create("atmosphere", 0, 0, 200, radius);
 		obj.p_radius = radius;
 		obj.physical.setdensity(0.01);
@@ -82,7 +85,17 @@ var atmosphere = {
 	draw: function(x, y){
 		this.physical.setx(x);
 		this.physical.sety(y);
-		game.getcontext().fillStyle= "rgba(200, 200, 200, 0.5)";
+
+
+		var gradient = game.getcontext().createRadialGradient(this.physical.getx() + game.screen.x,this.physical.gety() + game.screen.y,this.physical.getradius() - this.p_atmospheresize,this.physical.getx() + game.screen.x,this.physical.gety() + game.screen.y,this.physical.getradius());
+		gradient.addColorStop(0,"rgba(200, 200, 255, 1)");
+		gradient.addColorStop(1,"rgba(0, 0, 0, 0.1)");
+
+		// Fill with gradient
+		game.getcontext().fillStyle = gradient;
+
+
+		//game.getcontext().fillStyle= "rgba(200, 200, 255, 0.7)";
 		game.getcontext().beginPath();
 		game.getcontext().arc(this.physical.getx() + game.screen.x, this.physical.gety() + game.screen.y, this.physical.getradius(), 0, 2 * Math.PI);
 		game.getcontext().fill();

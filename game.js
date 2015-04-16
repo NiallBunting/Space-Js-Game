@@ -125,13 +125,18 @@ var game = {
 		//draw stars
 		this.drawstars();
 		
+//TODO Make the player draw last in all circumstances
+
 		//Sets the canvas pos on player
 		this.setcanvaspos(this.p_player);
 	
 		//Draw all the objects
-		for(var i = this.p_objects.length - 1; i >= 0; i--) {
+		for(var i = 1; i <= this.p_objects.length - 1; i++) {
 			this.p_objects[i].draw();
 		}
+
+		//Draws player on top
+		this.p_objects[0].draw();
 		
 		//draw the ui
 		game.p_ui.draw();
