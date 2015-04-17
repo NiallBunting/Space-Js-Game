@@ -7,7 +7,7 @@ var planet = {
 	create: function(x, y, mass, width, colour){
 		var obj = Object.create(this);
 		obj.physical = particle.create("planet", x, y, mass, width);
-		obj.atmosphere = atmosphere.create(width, 2000);
+		obj.atmosphere = atmosphere.create(width, 3000);
 		obj.p_colour = colour;
 		return obj;
 	},

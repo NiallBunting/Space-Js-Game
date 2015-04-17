@@ -43,11 +43,14 @@ var ship = {
 				this.p_hpregencumative = 0;
 			}
 		}
-		
+
 		return this.p_status;
 	},
 	
 	draw: function() {
+		//this has to be here, otherwise the shooting does not line up as all the ships have not updated
+		this.weapon.update();
+
 		game.getcontext().fillStyle= '#' + '900';
 		game.getcontext().beginPath();
 
@@ -98,8 +101,12 @@ var ship = {
 
 		if(this.physical.havecollided(obj)){		
 			//Does damage equal to this value
-			this.damage(calculate_distance(this.physical.getxspeed(), obj.getxspeed(), this.physical.getyspeed(), obj.getyspeed()));
+			var speedhit = calculate_distance(this.physical.getxspeed(), obj.getxspeed(), this.physical.getyspeed(), obj.getyspeed());
 			
+			if(speedhit > 10){
+				this.damage(Math.pow(speedhit, 1.3) - 19);
+			}
+
 			this.physical.collided(obj);
 		}
 	},
@@ -109,7 +116,7 @@ var ship = {
 	},
 	
 	shoot: function() {
-        this.weapon.shoot(this);
+        	this.weapon.trigger(this);
 	},
 	
 	destroy: function() {
@@ -156,6 +163,8 @@ var weapon = {
 	p_currentammo: 0, // Players ammo
 	p_currentreloadreadytime: 0, //If time is after this then ready
 	p_currentshootagaintime: 0, //time till they can shoot again
+
+	p_shootpressed: 0,
 	
 	create: function(type, magrounds, firetime, ammo, reloadtime, maxdistance, power, accuraccy){
 		var obj = Object.create(this);
@@ -186,6 +195,18 @@ var weapon = {
 	
 	gettype:function(){
 		return this.p_type;
+	},
+
+	trigger:function(ship){
+		this.p_shootpressed = ship;
+	},
+
+	update:function(){
+		//if object then shoot
+		if(this.p_shootpressed != 0){
+			this.shoot(this.p_shootpressed);
+			this.p_shootpressed = 0;
+		}
 	},
 	
 	shoot: function(ship){

@@ -125,7 +125,7 @@ var game = {
 		//draw stars
 		this.drawstars();
 		
-//TODO Make the player draw last in all circumstances
+//TODO Make the player draw last in all circumstancesmm
 
 		//Sets the canvas pos on player
 		this.setcanvaspos(this.p_player);
@@ -145,19 +145,18 @@ var game = {
 	drawstars: function(){
 		this.p_ctx.fillStyle= '#' + 'fff';
 		
-		var screenx = -this.screen.x;
-		var screeny = -this.screen.y;
+		//This sets the speed of the stars compared to cosmic speed, modulused to stay on screen
+		var screenxpush = ((this.screen.x) / 25) % this.getcanvas().width;
+		var screenypush = ((this.screen.y) / 25) % this.getcanvas().height;
 		
+		screenxpush = screenxpush < 0 ? this.getcanvas().width - Math.abs(screenxpush) : screenxpush;
+		screenypush = screenypush < 0 ? this.getcanvas().height - Math.abs(screenypush) : screenypush;
+
 		for(var i = 0; i < this.p_stars.length-1; i++){
-			if(this.p_stars[i][0] < screenx || this.p_stars[i][0] > screenx + this.getcanvas().width){
-				this.p_stars[i][0] = Math.random() > 0.5 ? (this.getcanvas().width - 5) + screenx : 5 + screenx;
-				this.p_stars[i][1] = (this.getcanvas().height * Math.random()) + screeny;
+			if(((this.p_stars[i][1] + screenypush) % this.getcanvas().height) < 1){
+				this.p_stars[i][0] = Math.random() * this.getcanvas().width;
 			}
-			if(this.p_stars[i][1] < screeny || this.p_stars[i][1] > screeny + this.getcanvas().height){
-				this.p_stars[i][0] = (this.getcanvas().width * Math.random()) + screenx;
-				this.p_stars[i][1] = Math.random() > 0.5 ? (this.getcanvas().height - 5) + screeny : 5 + screeny;
-			}
-			this.p_ctx.fillRect(this.p_stars[i][0] + this.screen.x, this.p_stars[i][1] + this.screen.y, this.p_stars[i][2], this.p_stars[i][2]);
+			this.p_ctx.fillRect((this.p_stars[i][0] + screenxpush) % this.getcanvas().width, (this.p_stars[i][1] + screenypush) % this.getcanvas().height , this.p_stars[i][2], this.p_stars[i][2]);
 		}
 	},
 	
