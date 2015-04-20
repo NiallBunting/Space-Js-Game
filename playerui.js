@@ -24,6 +24,7 @@ var ui = {
 			this.display.mappress();
 		}else{
 			this.p_displayopen = false;
+			this.display.mapunpress();
 		}
 		
 	},
@@ -95,17 +96,25 @@ var minimap = {
 };
 
 var leftdisplay = {	
+	p_mapppress: 0,
+	
 	create: function(){
 		var obj = Object.create(this);
 		return obj;
 	},
 	
 	draw: function(){
-		
+		if(this.p_mapppress){
+			//map.draw();
+		}
 	},
 	
 	mappress: function(){
-		
+		this.p_mapppress = true;
+	},
+	
+	mapunpress:function(){
+		this.p_mapppress = false;
 	}
 };
 
