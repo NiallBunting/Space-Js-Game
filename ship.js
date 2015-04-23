@@ -20,7 +20,7 @@ var ship = {
 	create: function(){
 		var obj = Object.create(this);
 		 //12680000
-		obj.physical = particle.create("ship", 0, 17590000, 10, 10);
+		obj.physical = particle.create("ship", 0, 17582000, 10, 10);
 		obj.weapon = weapon.create("machinegun", 50, 200, 500, 4000, 300, 20, 0.9);
 		obj.ship = obj;
 		return obj;

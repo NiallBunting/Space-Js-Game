@@ -1,36 +1,129 @@
 var ui = {
 	
 	p_displayopen: false,
+	p_mapfactor: 30000,
+	p_mapopen:false,
+	p_buttons:0,
+	p_hover:0,
 	
 	create: function(){
 		var obj = Object.create(this);
-		obj.display = leftdisplay.create();
 		obj.minimap = minimap.create();
+		obj.p_buttons = [];
+		obj.p_hover = [];
 		return obj;
 	},
 	
 	click: function(click){
-	
+	//check display is open
+		if(!this.p_displayopen) return;
+	//check if clicking a button
+		for(var i = 0; i < this.p_buttons.length ; i++){
+			console.log(i + " " + click.x + " " + click.y);
+			if (click.x > this.p_buttons[i][2]) continue;
+			if (click.x < this.p_buttons[i][0]) continue;
+			if (click.y > this.p_buttons[i][3]) continue;
+			if (click.y < this.p_buttons[i][1]) continue;
+
+			this.p_buttons[i][4](this.p_buttons[i][5]);
+		}
 	},
 	
 	mousepos: function(pos){
-		
+		//check display is open
+		if(!this.p_displayopen) return;
+		//check hover
+		for(var i = 0; i < this.p_hover.length ; i++){
+			if (pos.x > this.p_hover[i].x2) continue;
+			if (pos.x < this.p_hover[i].x1) continue;
+			if (pos.y > this.p_hover[i].y2) continue;
+			if (pos.y < this.p_hover[i].y1) continue;
+
+			this.p_hover[i].functioncalled(this.p_hover[i].varibles);
+		}
 	},
-	
+
+	createbutton:function(x1, y1, x2, y2, functioncalled, varibles){
+		this.p_buttons[this.p_buttons.length] = [x1, y1, x2, y2, functioncalled, varibles];
+	},
+
+	createhover:function(x1, y1, x2, y2, functioncalled, varibles){
+		this.p_hover[this.p_hover.length] = [x1, y1, x2, y2, functioncalled, varibles];
+	},
+
 	keys: function(keys){
 		// The M key
 		if(keys[77] == true){
-			this.p_displayopen = true;
-			this.display.mappress();
-		}else{
-			this.p_displayopen = false;
-			this.display.mapunpress();
+			this.p_displayopen = this.p_displayopen ? false : true;
+			this.p_mapopen = this.p_displayopen;
+			if(!this.p_displayopen){
+				this.p_mapfactor = 30000;
+				this.p_buttons = [];
+				this.p_hover = [];
+			}else{
+				this.setupmap();			
+			}
 		}
 		
 	},
-	
-	mousewheel: function(wheel){
+
+	setupmap:function(){
+		this.createbutton(15,4,100,21,game.getui().mousewheel,-1);
+		this.createbutton(15,44,100,61,game.getui().mousewheel,1);
+
+	},
+
+	showmap: function(){
 		
+		//save the screen
+		var screenx = game.screen.x;
+		var screeny = game.screen.y;
+
+		game.getcontext().fillStyle = "rgba(255, 255, 255, 0.8)";
+		game.getcontext().fillRect(0, 0, game.getcanvas().width, game.getcanvas().height);
+		//draw the ui
+
+		game.getcontext().fillStyle= 'rgba(0, 0, 0, 0.2)';
+		game.getcontext().fillRect(15, 25, 100, -21);
+		game.getcontext().fillRect(15, 65, 100, -21);
+		game.getcontext().fillStyle= '#000';
+		game.getcontext().fillText("Zoom In.",20,20);
+		game.getcontext().fillText("Zoom Out.",20,60);
+
+
+		//scale out
+		game.getcontext().scale(1/this.p_mapfactor, 1/this.p_mapfactor);
+
+		//setup the screen x and y with offset
+		game.screen.x = (game.getcanvas().width*this.p_mapfactor)/2;// + this.p_offsetx;
+		game.screen.y = (game.getcanvas().height*this.p_mapfactor)/2;// + this.p_offsety;
+
+		//draw everything
+		for(var i = game.p_objects.length - 1; i >= 0; i--) {
+			game.p_objects[i].draw();
+		}
+
+		game.getcontext().scale(this.p_mapfactor, this.p_mapfactor);
+
+		game.screen.x = screenx;
+		game.screen.y = screeny;          
+
+	},
+	
+	//wheel is one when rolling up, -1 down
+	mousewheel: function(wheel){
+		if(game.getui().p_mapopen){
+		console.log("click " + wheel);
+			if(wheel == 1){
+				if(game.getui().p_mapfactor < 100000){
+					game.getui().p_mapfactor += 1000;
+				}
+			}else{
+				if(game.getui().p_mapfactor > 2000){
+					game.getui().p_mapfactor -= 1000;
+				}
+			}
+		}
 	},
 	
 	isdisplayopen: function(){
@@ -51,8 +144,9 @@ var ui = {
 			
 			this.minimap.draw();
 		}else{
-			this.display.draw();
+			this.showmap();
 		}
+
 	}
 	
 };
@@ -95,28 +189,6 @@ var minimap = {
 	}
 };
 
-var leftdisplay = {	
-	p_mapppress: 0,
-	
-	create: function(){
-		var obj = Object.create(this);
-		return obj;
-	},
-	
-	draw: function(){
-		if(this.p_mapppress){
-			//map.draw();
-		}
-	},
-	
-	mappress: function(){
-		this.p_mapppress = true;
-	},
-	
-	mapunpress:function(){
-		this.p_mapppress = false;
-	}
-};
 
 /*
 var map = {

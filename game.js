@@ -31,10 +31,9 @@ var game = {
 		//Initialise Canvas, and allow canvas resizing
 		this.p_canv=document.getElementById("mycan");
 		this.p_ctx=this.p_canv.getContext("2d");	
-		this.p_ctx.font="20px Georgia";
 		window.addEventListener('resize', this.resizecanvas, false);
 		this.resizecanvas();
-		
+
 		//Create time
 		this.updatetime();
 		
@@ -57,6 +56,7 @@ var game = {
 		//http://stackoverflow.com/questions/4288253/html5-canvas-100-width-height-of-viewport
 		game.p_canv.width = window.innerWidth;
 		game.p_canv.height = window.innerHeight;
+		game.p_ctx.font='normal 20px Arial';
 	},
 	
 	createuniverse: function(){
@@ -238,7 +238,7 @@ var game = {
 	
 	//Higher is rolling up
 	setmouseroll: function(val){
-		this.p_mousewheel += val;
+		this.p_mousewheel = val;
 		
 		this.p_ui.mousewheel(this.p_mousewheel);
 	},
@@ -253,6 +253,10 @@ var game = {
 	
 	getplayer: function(){
 		return this.p_player;
+	},
+
+	getui: function(){
+		return this.p_ui;
 	}
 };
 

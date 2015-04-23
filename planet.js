@@ -89,6 +89,7 @@ var atmosphere = {
 
 		var gradient = game.getcontext().createRadialGradient(this.physical.getx() + game.screen.x,this.physical.gety() + game.screen.y,this.physical.getradius() - this.p_atmospheresize,this.physical.getx() + game.screen.x,this.physical.gety() + game.screen.y,this.physical.getradius());
 		gradient.addColorStop(0,"rgba(200, 200, 255, 1)");
+		gradient.addColorStop(0.1,"rgba(200, 200, 255, 1)");
 		gradient.addColorStop(1,"rgba(0, 0, 0, 0.1)");
 
 		// Fill with gradient
