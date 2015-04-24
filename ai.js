@@ -10,17 +10,30 @@ var shipai = {
 	p_previousangletoattack: 0,
 		
 	create: function(player){
+		var dist= 10000;
 		var obj = Object.create(this);
 		obj.ship = ship.create();
 		obj.physical = obj.ship.physical;
-		obj.physical.setx(1000 * Math.random());
-		//obj.physical.sety(1000 * Math.random());
+		var targetposangle = Math.random() * 2 * Math.PI;
+		var targetx = player.physical.getx() + (dist * Math.cos(targetposangle));
+		var targety = player.physical.gety() + (dist * Math.sin(targetposangle));
+		obj.physical.setx(targetx);
+		obj.physical.sety(targety);
+		obj.physical.p_mass = (Math.random() * 5) + 5;
 		obj.p_player = player;
+		obj.ship.p_direction = Math.random() * 2 * Math.PI;
+		obj.ship.p_fuel = 1000;
+		obj.ship.p_player = false;
 		return obj;
 	},
 
 	update: function(time){		
 		this.attack(this.p_player);
+
+		if(this.ship.getfuel() < 0){
+			
+			this.ship.destroy();
+		}		
 		return this.ship.update(time);
 	},
 

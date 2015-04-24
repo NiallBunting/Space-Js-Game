@@ -3,6 +3,7 @@ var planet = {
 	p_colour: 999,
 	p_orbit_object: 0,
 	p_orbit_dist: 0,
+	p_name: "planet",
 	
 	create: function(x, y, mass, width, colour){
 		var obj = Object.create(this);
@@ -59,6 +60,10 @@ var planet = {
 
 	collided: function(obj){
 		this.physical.collided(obj);
+	},
+
+	getname: function(){
+		return this.p_name;
 	}
 
 
@@ -89,6 +94,7 @@ var atmosphere = {
 
 		var gradient = game.getcontext().createRadialGradient(this.physical.getx() + game.screen.x,this.physical.gety() + game.screen.y,this.physical.getradius() - this.p_atmospheresize,this.physical.getx() + game.screen.x,this.physical.gety() + game.screen.y,this.physical.getradius());
 		gradient.addColorStop(0,"rgba(200, 200, 255, 1)");
+		gradient.addColorStop(0.1,"rgba(200, 200, 255, 1)");
 		gradient.addColorStop(1,"rgba(0, 0, 0, 0.1)");
 
 		// Fill with gradient
@@ -101,3 +107,4 @@ var atmosphere = {
 		game.getcontext().fill();
 	}
 };
+

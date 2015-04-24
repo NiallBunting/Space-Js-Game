@@ -1,5 +1,5 @@
 var ship = {
-
+	p_player:true,
 	p_direction: 0,
 	// power forward, back, left, right
 	p_power: [10 , -3, -0.01, 0.01],
@@ -7,20 +7,21 @@ var ship = {
 	p_hpregenamount: 0.002,
 	p_hpregencumative: 0,
 	p_maxhpregen: 0.8,
+	p_money: 10,
 	
 	p_maxhp: 100,
 	p_hp: 100,
 	p_armour: 50,
 	//Status: 0 fine, 9 destroyed
 	p_status: 0,
-	p_fuel: 1000,
+	p_fuel: 2000,
 	// One means completly random, any number higher adds a minimum
 	p_armourpower: 1,
 
 	create: function(){
 		var obj = Object.create(this);
 		 //12680000
-		obj.physical = particle.create("ship", 0, 17590000, 10, 10);
+		obj.physical = particle.create("ship", 0, 17582000, 10, 10);
 		obj.weapon = weapon.create("machinegun", 50, 200, 500, 4000, 300, 20, 0.9);
 		obj.ship = obj;
 		return obj;
@@ -67,23 +68,35 @@ var ship = {
 	},
 
 	left: function(){
+		if(this.p_fuel > 0){
 		this.spin(false);
 		this.removefuel(this.p_power[2]);
+		}
 	},
 
 	right: function(){
+		if(this.p_fuel > 0){
 		this.spin(true);
 		this.removefuel(this.p_power[3]);
+		}
 	},
 
 	up: function(){
+		if(this.p_fuel > 0){
 		this.forward(this.p_power[0]);
 		this.removefuel(this.p_power[0]);
+			if(this.p_player){
+			game.audio.engine.play();
+			game.audio.engine.volume = 0.2 * game.audio.getsoundvol();
+			}
+		}
 	},
 
 	down: function(){
+		if(this.p_fuel > 0){
 		this.forward(this.p_power[1]);
 		this.removefuel(this.p_power[1]);
+		}
 	},
 	
 	spin: function(right){
@@ -105,6 +118,11 @@ var ship = {
 			
 			if(speedhit > 10){
 				this.damage(Math.pow(speedhit, 1.3) - 19);
+
+				if(this.p_player){
+				game.audio.slap.play();
+				}
+
 			}
 
 			this.physical.collided(obj);
@@ -120,6 +138,7 @@ var ship = {
 	},
 	
 	destroy: function() {
+		game.audio.explosion.play();
 		this.p_status = 9;
 	},
 	
@@ -128,6 +147,8 @@ var ship = {
 
 		this.p_armour -= armoureffect;
 		this.p_hp -= (damage - armoureffect);
+
+		return this.p_hp;
 
 	},
 	
@@ -145,6 +166,14 @@ var ship = {
 	
 	removefuel: function(power){
 		this.p_fuel -= (Math.abs(power)/100);
+	},
+
+	getmoney: function(){
+		return this.p_money;
+	},
+
+	addmoney: function(newmoney){
+		this.p_money += newmoney;
 	}
 };
 
@@ -220,6 +249,9 @@ var weapon = {
 		//Adds reshoot time
 		this.p_currentshootagaintime = game.gettime() + this.p_firetime;
 
+		//shoot noise
+		game.audio.shoot.play();
+
 		// Removes one from current mag
 		this.p_currentmag--;
 		
@@ -258,7 +290,9 @@ var weapon = {
 		
 		if(closestobj.obj != 0){
 			this.p_draw = {x: closestobj.obj.physical.getx(), y:closestobj.obj.physical.gety()}; 
-			closestobj.obj.ship.damage(damage);
+			if(closestobj.obj.ship.damage(damage) < 10){
+				ship.addmoney(closestobj.obj.ship.physical.getmass());
+			}
 		}
 		
 	},

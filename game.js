@@ -31,10 +31,9 @@ var game = {
 		//Initialise Canvas, and allow canvas resizing
 		this.p_canv=document.getElementById("mycan");
 		this.p_ctx=this.p_canv.getContext("2d");	
-		this.p_ctx.font="20px Georgia";
 		window.addEventListener('resize', this.resizecanvas, false);
 		this.resizecanvas();
-		
+
 		//Create time
 		this.updatetime();
 		
@@ -43,6 +42,9 @@ var game = {
 		
 		//Create ui
 		this.p_ui = ui.create();
+
+		//create audio
+		this.audio = audio.create();
 		
 		//Creates the stars
 		this.p_stars = [];
@@ -57,6 +59,7 @@ var game = {
 		//http://stackoverflow.com/questions/4288253/html5-canvas-100-width-height-of-viewport
 		game.p_canv.width = window.innerWidth;
 		game.p_canv.height = window.innerHeight;
+		game.p_ctx.font='normal 20px Arial';
 	},
 	
 	createuniverse: function(){
@@ -77,6 +80,7 @@ var game = {
 		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
 	},
 	
+	//The game loop
 	loop: function(){
 		game.update();
 		game.draw();
@@ -113,6 +117,11 @@ var game = {
 				}
 				this.p_objects.splice(i, 1);
 			}
+		}
+
+		//possibly adds ai
+		if(Math.random() < 0.003){
+			this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
 		}
 		
 	},
@@ -238,7 +247,7 @@ var game = {
 	
 	//Higher is rolling up
 	setmouseroll: function(val){
-		this.p_mousewheel += val;
+		this.p_mousewheel = val;
 		
 		this.p_ui.mousewheel(this.p_mousewheel);
 	},
@@ -248,14 +257,48 @@ var game = {
 	},
 	
 	playerkilled: function(){
+		game.audio.yourdead.play();
 		console.log("You Died");
 	},
 	
 	getplayer: function(){
 		return this.p_player;
+	},
+
+	getui: function(){
+		return this.p_ui;
 	}
 };
 
+var audio = {
+	p_musicvol: 1,
+	p_soundvol: 1  ,
+
+	create: function(){
+		var obj = Object.create(this);
+		obj.puff= new Audio('puff.mp3');
+		obj.explosion= new Audio('explosion.mp3');
+		obj.shoot= new Audio('shoot.mp3');
+		obj.yourdead= new Audio('yourdead.mp3');
+		obj.slap= new Audio('slap.mp3');
+		obj.engine= new Audio('engine.mp3');
+            	return obj;
+        },
+
+	changevol: function(val){
+		obj.puff.volume = val;
+		obj.explosion.volume = val;
+		obj.shoot.volume = val;
+		obj.yourdead.volume = val;
+		obj.slap.volume = val;
+		obj.engine.volume = val;
+	},
+
+	getsoundvol: function(){
+		return this.p_soundvol;
+	}
+
+};
 ///////////////////
 ///////////////////
 
@@ -277,6 +320,8 @@ document.onkeydown = document.onkeyup = function(event) {
 }
 
 document.onmousewheel = function(event) {
+
+		event.preventDefault();
 		//up	
 		if(event.deltaY < 0){
 			game.setmouseroll(1);
@@ -289,11 +334,13 @@ document.onmousewheel = function(event) {
 }
 
 document.onmousemove = function(event) {
+	event.preventDefault();
 	var bounding_box= game.getcanvas().getBoundingClientRect();
 	game.setmousepos((event.clientX - bounding_box.left) * (game.getcanvas().width/bounding_box.width) , (event.clientY - bounding_box.top) * (game.getcanvas().height/bounding_box.height)); 
 }
 
 document.onclick = function(event) {
+	event.preventDefault();
 	game.setclicked();
 }
 
