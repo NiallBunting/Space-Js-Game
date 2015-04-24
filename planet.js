@@ -3,6 +3,7 @@ var planet = {
 	p_colour: 999,
 	p_orbit_object: 0,
 	p_orbit_dist: 0,
+	p_name: "planet",
 	
 	create: function(x, y, mass, width, colour){
 		var obj = Object.create(this);
@@ -59,6 +60,10 @@ var planet = {
 
 	collided: function(obj){
 		this.physical.collided(obj);
+	},
+
+	getname: function(){
+		return this.p_name;
 	}
 
 
