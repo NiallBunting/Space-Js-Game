@@ -7,7 +7,7 @@ var ui = {
 	p_hover:0,
 	p_popup:0,
 	p_mapoffset:0,
-	p_mousemove: true,
+	p_mousemove: false,
 	p_mouseposition: 0,
 	p_planetover: 0,
 	
@@ -65,15 +65,41 @@ var ui = {
 				this.setupmap();			
 			}
 		}
+
+		if(this.p_mapopen){			
+			//left
+			if(keys[37] == true || keys[65] == true){
+					this.p_mapoffset[0] -= (5 * this.p_mapfactor);
+			}
+
+			//right
+			if(keys[39] == true || keys[68] == true){
+					this.p_mapoffset[0] += (5 * this.p_mapfactor);
+			}
+
+			//up
+			if(keys[38] == true || keys[87] == true){
+					this.p_mapoffset[1] -= (5 * this.p_mapfactor);
+			}
+
+			//down
+			if(keys[40] == true ||keys[83] == true){
+					this.p_mapoffset[1] += (5 * this.p_mapfactor);
+			}
+
+		}
+
+
+
 		
 	},
-
+	//button to close the map
 	closemap: function(){
 		var temp = [];
 		temp[77] = true;	
 		game.getui().keys(temp);
 	},
-
+	//creates the buttons
 	setupmap:function(){
 		//zoom
 		this.createbutton(15,4,115,21,game.getui().mousewheel,-1);
@@ -99,15 +125,15 @@ var ui = {
 	mousemove:function(){
 		game.getui().p_mousemove = !game.getui().p_mousemove;
 	},
-
+	//called when center on ship called
 	centeronship: function(){
 		game.getui().p_mapoffset = [-game.getplayer().physical.getx(), -game.getplayer().physical.gety()]
 	},
-
+	//the method called when hoving over planet
 	planethover: function(planet){
 		game.getui().p_planetover = planet;
 	},
-
+	//Creates the hovers over the planets
 	moveplanethover: function(x, y, radius, object){
 		x = ((x + this.p_mapoffset[0]) / this.p_mapfactor) + (game.getcanvas().width/2);
 		y = ((y + this.p_mapoffset[1]) / this.p_mapfactor) + (game.getcanvas().height/2);
@@ -136,7 +162,7 @@ var ui = {
 		game.getcontext().fillStyle= '#000';
 		game.getcontext().fillText("Zoom In.",20,20);
 		game.getcontext().fillText("Zoom Out.",20,60);
-		game.getcontext().fillText("Lock.",20,100);
+		game.getcontext().fillText("MouseLock.",20,100);
 		game.getcontext().fillText("Player.",20,140);
 		game.getcontext().fillText("Clear Tar.",20,180);
 		game.getcontext().fillText("Exit Map.",game.getcanvas().width - 115,20);
@@ -167,7 +193,7 @@ var ui = {
 		this.p_planetover = 0;
 
 	},
-
+	//Draws the name of the planet on the map
 	drawpopup: function(){
 		if(this.p_planetover == 0){return;}
 		this.minimap.settarget(this.p_planetover);
@@ -196,6 +222,7 @@ var ui = {
 	},
 	
 	update: function(){
+		//Checks if near the edge of the screen, to scroll
 		if(this.p_mousemove){
 			if(this.p_mouseposition.x > game.getcanvas().width - (game.getcanvas().width * 0.1)){this.p_mapoffset[0] -= (5 * this.p_mapfactor);}
 			if(this.p_mouseposition.x < (game.getcanvas().width * 0.1)){this.p_mapoffset[0] += (5 * this.p_mapfactor);}
@@ -215,13 +242,14 @@ var ui = {
 	},
 	
 	draw: function(){
-		
+		//draws the ui
 		if(!this.p_displayopen){
 			game.getcontext().fillStyle= '#0f0';
 			game.getcontext().fillText("Hp: "+ Math.ceil(game.getplayer().gethp()) + " Armour: " + Math.ceil(game.getplayer().getarmour()) ,10,20);
 			game.getcontext().fillText("Cosmic Speed: " + Math.ceil(game.getplayer().physical.getspeed()) + " Fuel: " + Math.ceil(game.getplayer().getfuel()),10,40);
-			game.getcontext().fillText(game.getplayer().weapon.gettype(),10,60);
-			game.getcontext().fillText(game.getplayer().weapon.getammo(),10,80);
+			game.getcontext().fillText("\u00A3" + Math.round(game.getplayer().getmoney()),10,60);
+			game.getcontext().fillText(game.getplayer().weapon.gettype(),10,80);
+			game.getcontext().fillText(game.getplayer().weapon.getammo(),10,1000);
 			
 			this.minimap.draw();
 		}else{
@@ -243,18 +271,8 @@ var minimap = {
 	settarget:function(target){
 		this.p_target = target;
 	},
-//x = cx + r * cos(a)
-//y = cy + r * sin(a)
 	
 	draw: function(){	
-		if(this.p_target != 0){
-			var speed = Math.round(calculate_distance(this.p_target.physical.getxspeed(), game.getplayer().physical.getxspeed(), this.p_target.physical.getyspeed(), game.getplayer().physical.getyspeed()));
-			var distance = Math.round(calculate_distance(this.p_target.physical.getx(), game.getplayer().physical.getx(), this.p_target.physical.gety(), game.getplayer().physical.gety()));		
-			game.getcontext().fillStyle= '"rgba(0, 0, 0, 0.8)"';
-			game.getcontext().fillText("Distance: " + distance,(game.getcanvas().width - 200), (game.getcanvas().height - 240));
-			game.getcontext().fillText("Speed:    " + speed,(game.getcanvas().width - 200), (game.getcanvas().height - 200) );
-			game.getcontext().fillText("Target:   "+ this.p_target.getname(),(game.getcanvas().width - 200), (game.getcanvas().height - 280));	
-		}
 		var size = 80;				
 		var scale = (game.getplayer().physical.getspeed() * 5) + 100;
 		game.getcontext().scale(1/scale, 1/scale);
@@ -265,10 +283,20 @@ var minimap = {
 		game.getcontext().lineWidth = 4 * scale;
 		game.getcontext().strokeStyle = "rgba(255, 255, 255, 0.8)";
 		game.getcontext().stroke();
+	
+		//drawing the direction dot
+		if(this.p_target != 0){
+			game.getcontext().fillStyle= '#f00';
+			var targetposangle = -Math.atan2(this.p_target.physical.getx()- game.getplayer().physical.getx(), this.p_target.physical.gety() - game.getplayer().physical.gety()) + (Math.PI/2);
+			var targetx = (game.getcanvas().width - 100) * scale + (size * scale * Math.cos(targetposangle));
+			var targety = (game.getcanvas().height - 100) * scale + (size * scale * Math.sin(targetposangle));
+			game.getcontext().beginPath();
+			game.getcontext().arc(targetx, targety , 1000, 0, 2 * Math.PI);
+			game.getcontext().fill();
+		}
 
 
-
-		
+		//draws enemy dots
 		for(var i = 0; i < game.p_objects.length; i++) {
 			// if(game.p_objects[i] == game.getplayer()){continue;}
 			if(calculate_distance(game.p_objects[i].physical.getx() , game.getplayer().physical.getx(), game.p_objects[i].physical.gety(), game.getplayer().physical.gety()) < ((size - 1) * scale)){
@@ -282,147 +310,15 @@ var minimap = {
 		}
 		
 		game.getcontext().scale(scale, scale);
+		//draws text about target
+		if(this.p_target != 0){
+			var speed = Math.round(calculate_distance(this.p_target.physical.getxspeed(), game.getplayer().physical.getxspeed(), this.p_target.physical.getyspeed(), game.getplayer().physical.getyspeed()));
+			var distance = Math.round(calculate_distance(this.p_target.physical.getx(), game.getplayer().physical.getx(), this.p_target.physical.gety(), game.getplayer().physical.gety()) - this.p_target.physical.getradius());		
+			game.getcontext().fillStyle = '#0f0';
+			game.getcontext().fillText("Distance: " + distance,(game.getcanvas().width - 200), (game.getcanvas().height - 220));
+			game.getcontext().fillText("Speed:    " + speed,(game.getcanvas().width - 200), (game.getcanvas().height - 200) );
+			game.getcontext().fillText("Target:   "+ this.p_target.getname(),(game.getcanvas().width - 200), (game.getcanvas().height - 240));	
+		}
 
 	}
 };
-
-
-/*
-var map = {
-	p_screenx:0,
-	p_screeny:0,
-	p_factor:3000,
-	p_previouspress: 0,
-	p_open:0,
-	p_offsetx: 0,
-	p_offsety: 0,
-
-	pressed: function() {
-		if(keys[77] == true && this.p_previouspress === 0){
-			if(this.p_open === 1){
-				this.p_open = 0; 
-				this.p_offsetx = this.p_offsety = 0;
-				this.p_factor = 3000;
-			}else{
-				this.p_open = 1;
-			}
-			this.p_previouspress = 1;
-		}
-		if(keys[77] == false){
-			this.p_previouspress = 0;
-		}
-
-		return this.p_open;
-	},
-
-	draw: function() {
-		//dont draw anything if map open is 0
-		if(!this.pressed()){return false;}
-		
-		//remember the previous screen
-		this.p_screenx = screen.x;
-		this.p_screeny = screen.y;
-
-		//draw the title
-		game.getcontext().clearRect(0, 0, canv.width, canv.height);
-		
-		//draw the ui
-		game.getcontext().fillStyle= '#' + 'fff';		
-		game.getcontext().fillRect(0, 0, canv.width, 40);
-		game.getcontext().fillStyle= '#' + 'aaa';		
-		game.getcontext().fillRect(0, 40, canv.width, 2);
-		
-		game.getcontext().fillText("Map.",20,20);
-		
-
-		
-		//scale out
-		game.getcontext().scale(1/this.p_factor, 1/this.p_factor);
-
-		//setup the screen x and y with offset
-		screen.x = (canv.width*this.p_factor)/2 + this.p_offsetx;
-		screen.y = (canv.height*this.p_factor)/2 + this.p_offsety;
-
-		//Calculate the mouse
-		var mouseobj = particle.create(((mouseplace.x * this.p_factor) - screen.x), ((mouseplace.y * this.p_factor) - screen.y), 0, (4 * this.p_factor));
-
-		
-		//draw the ship
-		ctx.fillStyle= '#' + '900';
-		ctx.beginPath();
-		ctx.arc(updateobjects[0].physical.getx() + screen.x, updateobjects[0].physical.gety() + screen.y, (3 * this.p_factor), 0, 2 * Math.PI);
-		ctx.fill();
-		
-		//draw everything
-		for(i = updateobjects.length - 1; i >= 0; i--) {
-			updateobjects[i].draw();
-		}
-		this.mouseover(mouseobj);	
-		
-		ctx.scale(this.p_factor, this.p_factor);
-
-		//put the offset back
-		screen.x = this.p_screenx;
-		screen.y = this.p_screeny;
-		
-	},
-	
-	mouseover: function (mouseobj) {
-		
-		for(i = updateobjects.length - 1; i >= 0; i--) {
-			if(updateobjects[i].physical.havecollided(mouseobj)){
-				if(i != 0) {playerui.settarget(i);}
-				else{playerui.settarget(null);}
-				
-				//draw mouse
-				ctx.fillStyle= "rgba(0, 255, 255, 0.4)";
-				ctx.beginPath();
-				ctx.arc(mouseobj.getx() + screen.x, mouseobj.gety() + screen.y, mouseobj.getradius(), 0, 2 * Math.PI);
-				ctx.fill();
-			}
-		}
-	},
-	
-	left: function () {
-		this.p_offsetx += this.p_factor * 10;
-	},
-
-	right: function () {
-		this.p_offsetx -= this.p_factor * 10;
-	},
-
-	up: function () {
-		this.p_offsety += this.p_factor * 10;
-	},
-
-	down: function () {
-		this.p_offsety -= this.p_factor * 10;
-	},
-
-	mousewheelin: function () {
-		this.p_factor -= 100;
-		if(this.p_factor < 200){this.p_factor = 200;}
-	},
-
-	mousewheelout: function () {
-		this.p_factor += 100;
-		if(this.p_factor > 10000000){this.p_factor = 10000000;}
-	},
-
-	ismapopen: function() {
-		return this.p_open;
-	},
-
-	line: function(obj) {
-		ctx.strokeStyle= '#' + '000';
-		ctx.lineWidth = 1;
-		ctx.beginPath();
-      		ctx.moveTo(updateobjects[0].physical.getx()+ screen.x, updateobjects[0].physical.gety()+ screen.y);
-      		ctx.lineTo(obj.physical.getx()+ screen.x, obj.physical.gety()+ screen.y);
-		ctx.stroke();
-		var dist =  Math.round(calculate_distance(updateobjects[0].physical.getx(), obj.physical.getx(), 
-			updateobjects[0].physical.gety(), obj.physical.gety()) - obj.physical.getradius());
-		ctx.fillText("Distance: " + dist,50,50);
-	}
-};
-*/
