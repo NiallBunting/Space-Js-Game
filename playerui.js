@@ -309,7 +309,7 @@ var ui = {
 				game.getcontext().fillText("Cosmic Speed: " + Math.ceil(game.getplayer().physical.getspeed()) + " Fuel: " + Math.ceil(game.getplayer().getfuel()),10,40);
 				game.getcontext().fillText("\u00A3" + Math.round(game.getplayer().getmoney()),10,60);
 				game.getcontext().fillText(game.getplayer().weapon.gettype(),10,80);
-				game.getcontext().fillText(game.getplayer().weapon.getammo(),10,1000);
+				game.getcontext().fillText(game.getplayer().weapon.getammo(),10,100);
 				game.getcontext().fillStyle= '#000';
 				game.getcontext().fillText("Menu.",game.getcanvas().width - 115,20);
 			
