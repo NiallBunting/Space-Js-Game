@@ -10,6 +10,7 @@ var ui = {
 	p_mousemove: false,
 	p_mouseposition: 0,
 	p_planetover: 0,
+	p_mainmenu:true,
 	
 	create: function(){
 		var obj = Object.create(this);
@@ -21,12 +22,6 @@ var ui = {
 	},
 	
 	click: function(click){
-	//check display is open
-		if(!this.p_displayopen) return;
-		//mouse move
-		if(this.p_mousemove){
-
-		}
 	//check if clicking a button
 		for(var i = 0; i < this.p_buttons.length ; i++){
 			if (click.x > this.p_buttons[i][2]) continue;
@@ -61,8 +56,11 @@ var ui = {
 				this.p_buttons = [];
 				this.p_hover = [];
 				this.p_mapoffset = [0, 0];
+				//buttontomenu
+				this.createbutton(game.getcanvas().width - 115,4, game.getcanvas().width - 15, 21,game.getui().menumaintrue,0);
 			}else{
-				this.setupmap();			
+					this.p_buttons = [];
+					this.setupmap();			
 			}
 		}
 
@@ -99,6 +97,7 @@ var ui = {
 		temp[77] = true;	
 		game.getui().keys(temp);
 	},
+
 	//creates the buttons
 	setupmap:function(){
 		//zoom
@@ -140,6 +139,10 @@ var ui = {
 		radius /= this.p_mapfactor;
 
 		this.createhover(x-radius, y-radius, x+radius, y+radius, this.planethover, object);
+	},
+
+	menumaintrue:function(){
+		game.getui().p_mainmenu = true;
 	},
 
 	showmap: function(){
@@ -222,6 +225,11 @@ var ui = {
 	},
 	
 	update: function(){
+		if(!this.p_mapopen){
+		this.p_buttons = [];
+			//buttontomenu
+			this.createbutton(game.getcanvas().width - 115,4, game.getcanvas().width - 15, 21,this.menumaintrue,0);
+		}
 		//Checks if near the edge of the screen, to scroll
 		if(this.p_mousemove){
 			if(this.p_mouseposition.x > game.getcanvas().width - (game.getcanvas().width * 0.1)){this.p_mapoffset[0] -= (5 * this.p_mapfactor);}
@@ -240,22 +248,85 @@ var ui = {
 			this.p_hover[i][4](this.p_hover[i][5]);
 		}
 	},
+
+	drawmainmenu:function(){
+
+			this.p_buttons = [];
+
+			this.createbutton(20,65,200,95,game.getui().mainmenuclose,0);
+			this.createbutton(20,105,200,135,game.getui().link,"./about.html");
+			this.createbutton(20,145,200,175,game.getui().link,"https://github.com/NiallBunting/HTML5JS-Game");
+			this.createbutton(20,185,200,215,game.getui().soundtoggle,0);
+
+			game.getcontext().fillStyle = '#fff';
+			game.getcontext().fillRect(0, 0, game.getcanvas().width, game.getcanvas().height);
+			game.getcontext().fillStyle = '#000';	
+			game.p_ctx.font='normal 50px Arial';
+			game.getcontext().fillText("Spacegame!",20,50);
+			game.p_ctx.font='normal 20px Arial';
+			game.getcontext().fillText("Play",20,90);		
+			game.getcontext().fillText("About Page",20,130);	
+			game.getcontext().fillText("GitHub",20,170);
+			game.getcontext().fillText("Sound Off/On",20,210);
+
+			if(typeof(Storage) !== "undefined") {
+			game.getcontext().fillText("High Scores",game.getcanvas().width - 305,90);
+			game.getcontext().fillText("1. " + localStorage.getItem("firstname") + " \u00A3" + localStorage.getItem("firstscore"),game.getcanvas().width - 305,110);
+			game.getcontext().fillText("2. " + localStorage.getItem("secondname") + " \u00A3" + localStorage.getItem("secondscore"),game.getcanvas().width - 305,130);
+			game.getcontext().fillText("3. " + localStorage.getItem("thirdname") + " \u00A3" + localStorage.getItem("thirdscore"),game.getcanvas().width - 305,150);
+			game.getcontext().fillText("4. " + localStorage.getItem("forthname") + " \u00A3" + localStorage.getItem("forthscore"),game.getcanvas().width - 305,170);	
+			game.getcontext().fillText("5. " + localStorage.getItem("fifthname") + " \u00A3" + localStorage.getItem("fifthscore"),game.getcanvas().width - 305,190);
+			} else {
+			game.getcontext().fillText("You don't support storage.",game.getcanvas().width - 305,90);
+			}
+	
+	},
+
+	soundtoggle:function(){
+		if(game.audio.getsoundvol() == 1){
+		game.audio.changevol(0);
+		}else{
+		game.audio.changevol(1);
+		}
+	},
+
+	link:function(url){
+		document.location.href = url;
+	},
 	
 	draw: function(){
-		//draws the ui
-		if(!this.p_displayopen){
-			game.getcontext().fillStyle= '#0f0';
-			game.getcontext().fillText("Hp: "+ Math.ceil(game.getplayer().gethp()) + " Armour: " + Math.ceil(game.getplayer().getarmour()) ,10,20);
-			game.getcontext().fillText("Cosmic Speed: " + Math.ceil(game.getplayer().physical.getspeed()) + " Fuel: " + Math.ceil(game.getplayer().getfuel()),10,40);
-			game.getcontext().fillText("\u00A3" + Math.round(game.getplayer().getmoney()),10,60);
-			game.getcontext().fillText(game.getplayer().weapon.gettype(),10,80);
-			game.getcontext().fillText(game.getplayer().weapon.getammo(),10,1000);
+		if(this.p_mainmenu){
+			this.drawmainmenu();
 			
-			this.minimap.draw();
 		}else{
-			this.showmap();
+
+			//draws the ui
+			if(!this.p_displayopen){
+				game.getcontext().fillStyle= '#bbb';
+				game.getcontext().fillRect(game.getcanvas().width - 115, 25, 100, -21);
+				game.getcontext().fillStyle= '#0f0';
+				game.getcontext().fillText("Hp: "+ Math.ceil(game.getplayer().gethp()) + " Armour: " + Math.ceil(game.getplayer().getarmour()) ,10,20);
+				game.getcontext().fillText("Cosmic Speed: " + Math.ceil(game.getplayer().physical.getspeed()) + " Fuel: " + Math.ceil(game.getplayer().getfuel()),10,40);
+				game.getcontext().fillText("\u00A3" + Math.round(game.getplayer().getmoney()),10,60);
+				game.getcontext().fillText(game.getplayer().weapon.gettype(),10,80);
+				game.getcontext().fillText(game.getplayer().weapon.getammo(),10,1000);
+				game.getcontext().fillStyle= '#000';
+				game.getcontext().fillText("Menu.",game.getcanvas().width - 115,20);
+			
+				this.minimap.draw();
+			}else{
+				this.showmap();
+			}
 		}
 
+	},
+
+	mainmenuopen: function(){
+		return this.p_mainmenu;
+	},
+
+	mainmenuclose: function(){
+		game.getui().p_mainmenu = false;
 	}
 	
 };
@@ -291,7 +362,7 @@ var minimap = {
 			var targetx = (game.getcanvas().width - 100) * scale + (size * scale * Math.cos(targetposangle));
 			var targety = (game.getcanvas().height - 100) * scale + (size * scale * Math.sin(targetposangle));
 			game.getcontext().beginPath();
-			game.getcontext().arc(targetx, targety , 1000, 0, 2 * Math.PI);
+			game.getcontext().arc(targetx, targety , 5 * scale, 0, 2 * Math.PI);
 			game.getcontext().fill();
 		}
 

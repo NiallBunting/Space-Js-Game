@@ -9,6 +9,7 @@ var game = {
 	p_mousewheel: 0,
 	p_mousepos: 0,
 	p_mouseclick: 0,
+	p_name:false,
 	
 	//
 	p_ui:0,
@@ -91,13 +92,15 @@ var game = {
 		//checks for keypresses
 		this.keypresses();
 		
+		this.p_ui.update();
+
+		if(game.getui().mainmenuopen()){return;}
 		//Updates the time
 		var oldtime = this.gettime();
 		this.updatetime();
 		var updatetime = (this.gettime() - oldtime)/100;
 		updatetime = (updatetime > this.p_maxtimeout) ? this.p_maxtimeout : updatetime;
 		
-		this.p_ui.update();
 		
 		//Updates gravity and collisions
 		for(var i = 0; i < this.p_objects.length; i++) {
@@ -108,13 +111,15 @@ var game = {
 			}
 		}
 		
+		if(this.p_player.update(updatetime) == 9){
+			this.playerkilled();
+		}
+
 		//Updates the positions
 		for(var i = 0; i < this.p_objects.length; i++) {
+			if(this.p_objects[i] == this.p_player){continue;}
 			var val = this.p_objects[i].update(updatetime);
 			if (val == 9){
-				if(this.p_objects[i] == this.p_player){
-					this.playerkilled();
-				}
 				this.p_objects.splice(i, 1);
 			}
 		}
@@ -133,19 +138,19 @@ var game = {
 		
 		//draw stars
 		this.drawstars();
-		
-//TODO Make the player draw last in all circumstancesmm
+
 
 		//Sets the canvas pos on player
 		this.setcanvaspos(this.p_player);
 	
 		//Draw all the objects
-		for(var i = 1; i <= this.p_objects.length - 1; i++) {
+		for(var i = 0; i <= this.p_objects.length - 1; i++) {
+			if(this.p_player == this.p_objects[i]){continue;}
 			this.p_objects[i].draw();
 		}
 
 		//Draws player on top
-		this.p_objects[0].draw();
+		this.p_player.draw();
 		
 		//draw the ui
 		game.p_ui.draw();
@@ -286,12 +291,13 @@ var audio = {
         },
 
 	changevol: function(val){
-		obj.puff.volume = val;
-		obj.explosion.volume = val;
-		obj.shoot.volume = val;
-		obj.yourdead.volume = val;
-		obj.slap.volume = val;
-		obj.engine.volume = val;
+		this.p_soundvol = val;
+		this.puff.volume = val;
+		this.explosion.volume = val;
+		this.puff.shoot = val;
+		this.puff.yourdead = val;
+		this.puff.slap = val;
+		this.puff.engine = val;
 	},
 
 	getsoundvol: function(){

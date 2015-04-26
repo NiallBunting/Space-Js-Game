@@ -119,9 +119,12 @@ var ship = {
 			if(speedhit > 10){
 				this.damage(Math.pow(speedhit, 1.3) - 19);
 
-				if(this.p_player){
+				var musicdist = calculate_distance(this.physical.getx() , game.getplayer().physical.getx(), this.physical.gety(), game.getplayer().physical.gety());
+				var musicvolume = ((-(Math.pow(Math.abs(musicdist), 1.1)))/10000) +1;
+				if(musicvolume < 0){game.audio.slap.volume = game.audio.getsoundvol() *  musicvolume * 0.2;}
+				game.audio.slap.volume = game.audio.slap.volume *  game.audio.getsoundvol();
 				game.audio.slap.play();
-				}
+
 
 			}
 
@@ -138,6 +141,11 @@ var ship = {
 	},
 	
 	destroy: function() {
+		var musicdist = calculate_distance(this.physical.getx() , game.getplayer().physical.getx(), this.physical.gety(), game.getplayer().physical.gety());
+		var musicvolume = ((-(Math.pow(Math.abs(musicdist), 1.1)))/10000) +1;
+		if(musicvolume < 0){musicvolume = 0;}
+		game.audio.explosion.volume = game.audio.getsoundvol() *  musicvolume;
+		game.audio.explosion.volume = game.audio.explosion.volume *  game.audio.getsoundvol();
 		game.audio.explosion.play();
 		this.p_status = 9;
 	},
@@ -210,6 +218,12 @@ var weapon = {
 	},
 	
 	draw: function(ship){
+		//moved to draw so lines up
+		if(this.p_shootpressed != 0){
+			this.shoot(this.p_shootpressed);
+			this.p_shootpressed = 0;
+		}
+
 		if(this.p_draw != 0){
 			game.getcontext().lineWidth = 2;
 			game.getcontext().strokeStyle= '#' +  '0f0'; // 'ddb';
@@ -231,11 +245,7 @@ var weapon = {
 	},
 
 	update:function(){
-		//if object then shoot
-		if(this.p_shootpressed != 0){
-			this.shoot(this.p_shootpressed);
-			this.p_shootpressed = 0;
-		}
+
 	},
 	
 	shoot: function(ship){
@@ -250,6 +260,10 @@ var weapon = {
 		this.p_currentshootagaintime = game.gettime() + this.p_firetime;
 
 		//shoot noise
+		var musicdist = calculate_distance(ship.physical.getx() , game.getplayer().physical.getx(), ship.physical.gety(), game.getplayer().physical.gety());
+		var musicvolume = ((-(Math.pow(Math.abs(musicdist), 1.1)))/10000) +1;
+		if(musicvolume < 0){game.audio.shoot.volume = game.audio.getsoundvol() *  musicvolume * 0.2;}
+		game.audio.shoot.volume = game.audio.shoot.volume *  game.audio.getsoundvol();
 		game.audio.shoot.play();
 
 		// Removes one from current mag
