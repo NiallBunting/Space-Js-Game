@@ -263,7 +263,77 @@ var game = {
 	
 	playerkilled: function(){
 		game.audio.yourdead.play();
-		console.log("You Died");
+		if(typeof(Storage) !== "undefined") {
+		var name = prompt("Please enter your name", "Captain N");
+
+		//this could be done much better by having a rolling score datastructure
+		if(localStorage.getItem("firstscore") < this.getplayer().getmoney())
+		{
+			//pushes down
+			localStorage.setItem("fifthname", localStorage.getItem("forthname"));
+			localStorage.setItem("fifthscore", localStorage.getItem("forthscore"));
+			localStorage.setItem("forthname", localStorage.getItem("thirdname"));
+			localStorage.setItem("forthscore", localStorage.getItem("thirdscore"));
+			localStorage.setItem("thirdname", localStorage.getItem("secondname"));
+			localStorage.setItem("thirdscore", localStorage.getItem("secondscore"));
+			localStorage.setItem("secondname", localStorage.getItem("firstname"));
+			localStorage.setItem("secondscore", localStorage.getItem("firstscore"));
+			//new info
+			localStorage.setItem("firstname", name);
+			localStorage.setItem("firstscore", this.getplayer().getmoney());
+		}
+		else{
+			if(localStorage.getItem("secondscore") < this.getplayer().getmoney())
+			{
+				//pushesdown
+				localStorage.setItem("fifthname", localStorage.getItem("forthname"));
+				localStorage.setItem("fifthscore", localStorage.getItem("forthscore"));
+				localStorage.setItem("forthname", localStorage.getItem("thirdname"));
+				localStorage.setItem("forthscore", localStorage.getItem("thirdscore"));
+				localStorage.setItem("thirdname", localStorage.getItem("secondname"));
+				localStorage.setItem("thirdscore", localStorage.getItem("secondscore"));
+				//new info
+				localStorage.setItem("secondname", name);
+				localStorage.setItem("secondscore", this.getplayer().getmoney());
+			}
+			else
+			{
+				if(localStorage.getItem("thirdscore") < this.getplayer().getmoney())
+				{
+					//pushes down
+					localStorage.setItem("fifthname", localStorage.getItem("forthname"));
+					localStorage.setItem("fifthscore", localStorage.getItem("forthscore"));
+					localStorage.setItem("forthname", localStorage.getItem("thirdname"));
+					localStorage.setItem("forthscore", localStorage.getItem("thirdscore"));
+					//new info
+					localStorage.setItem("thirdname", name);
+					localStorage.setItem("thirdscore", this.getplayer().getmoney());
+				}
+				else{
+					if(localStorage.getItem("forthscore") < this.getplayer().getmoney())
+					{	//pushes down
+						localStorage.setItem("fifthname", localStorage.getItem("forthname"));
+						localStorage.setItem("fifthscore", localStorage.getItem("forthscore"));
+						//new info
+						localStorage.setItem("forthname", name);
+						localStorage.setItem("forthscore", this.getplayer().getmoney());
+					}
+					else{
+						if(localStorage.getItem("fifthscore") < this.getplayer().getmoney())
+						{
+							localStorage.setItem("fifthname", name);
+							localStorage.setItem("fifthscore", this.getplayer().getmoney());
+						}
+					}
+				}
+			}
+
+		}
+
+		}else{
+			alert("Unable to set highscore.");
+		}
+		location.reload();
 	},
 	
 	getplayer: function(){
