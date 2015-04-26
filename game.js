@@ -67,14 +67,19 @@ var game = {
 		this.p_objects[this.p_objects.length] = ship.create();
 		this.p_player = this.p_objects[this.p_objects.length - 1];
 		
-		this.p_objects[this.p_objects.length] = planet.create(0, 0, 63000000000000, 160000, 'FFFF00');		
-		this.p_objects[this.p_objects.length] = planet.create(0, 3000000, 3700000000, 74000, '787878');
-		this.p_objects[this.p_objects.length] = planet.create(0, 8321000, 4700000000, 77000, 'CC0000');
-		this.p_objects[this.p_objects.length] = planet.create(0, 12721000, 7000000000, 50000, 'CC3300');
-		this.p_objects[this.p_objects.length] = planet.create(0, 14942000, 4100000000, 96000, '787878');	
-		this.p_objects[this.p_objects.length] = planet.create(0, 17530000, 1200000000, 52000, '00CC00');
-		this.p_objects[this.p_objects.length] = planet.create(0, 18900000, 600000000, 43000, '0066FF');
-		for(i = 2; i < this.p_objects.length; i++) {
+		this.p_objects[this.p_objects.length] = planet.create(0, 0, 63000000000000, 160000, 'FFFF00', "Sun");		
+		this.p_objects[this.p_objects.length] = planet.create(4200000 * Math.cos(Math.random() * 2 * Math.PI), 4200000 * Math.sin(Math.random() * 2 * Math.PI), 3700000000, 74000, '787878', "Tars");
+		this.p_objects[this.p_objects.length] = planet.create(5400000 * Math.cos(Math.random() * 2 * Math.PI), 5400000 * Math.sin(Math.random() * 2 * Math.PI), 4700000000, 77000, 'CC0000', "Niallopia");
+		this.p_objects[this.p_objects.length] = planet.create(6600000 * Math.cos(Math.random() * 2 * Math.PI), 6600000 * Math.sin(Math.random() * 2 * Math.PI), 7000000000, 50000, 'CC3300', "Larth");
+		this.p_objects[this.p_objects.length] = planet.create(7800000 * Math.cos(Math.random() * 2 * Math.PI), 7700000 * Math.sin(Math.random() * 2 * Math.PI), 4100000000, 96000, '787878', "Vapper");	
+		this.p_objects[this.p_objects.length] = planet.create(9000000 * Math.cos(Math.random() * 2 * Math.PI), 9000000 * Math.sin(Math.random() * 2 * Math.PI), 1200000000, 52000, '00CC00', "Nabb");
+		var xpos = 10200000 * Math.cos(Math.random() * 2 * Math.PI);
+		var ypos = 10200000 * Math.sin(Math.random() * 2 * Math.PI);
+
+		this.p_objects[this.p_objects.length] = planet.create(xpos, ypos, 600000000, 43000, '0066FF', "TuTu");
+		this.p_player.physical.setx(xpos + 42990);
+		this.p_player.physical.sety(ypos);
+		for(var i = 2; i < this.p_objects.length; i++) {
 			this.p_objects[i].orbit(this.p_objects[1]);
 		}
 		
@@ -136,6 +141,12 @@ var game = {
 		//clear the screen
 		this.getcontext().clearRect(0, 0, this.getcanvas().width, this.getcanvas().height);
 		
+		if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1)
+		{
+		game.getcontext().fillStyle= '#' + '000';
+		this.getcontext().fillRect(20,20,150,100);
+		}
+
 		//draw stars
 		this.drawstars();
 
@@ -160,8 +171,8 @@ var game = {
 		this.p_ctx.fillStyle= '#' + 'fff';
 		
 		//This sets the speed of the stars compared to cosmic speed, modulused to stay on screen
-		var screenxpush = ((this.screen.x) / 25) % this.getcanvas().width;
-		var screenypush = ((this.screen.y) / 25) % this.getcanvas().height;
+		var screenxpush = ((this.screen.x) / 50) % this.getcanvas().width;
+		var screenypush = ((this.screen.y) / 50) % this.getcanvas().height;
 		
 		screenxpush = screenxpush < 0 ? this.getcanvas().width - Math.abs(screenxpush) : screenxpush;
 		screenypush = screenypush < 0 ? this.getcanvas().height - Math.abs(screenypush) : screenypush;
@@ -267,7 +278,7 @@ var game = {
 		var name = prompt("Please enter your name", "Captain N");
 
 		//this could be done much better by having a rolling score datastructure
-		if(localStorage.getItem("firstscore") < this.getplayer().getmoney())
+		if(localStorage.getItem("firstscore") < this.getplayer().getmoney() || localStorage.getItem("firstscore") == "null")
 		{
 			//pushes down
 			localStorage.setItem("fifthname", localStorage.getItem("forthname"));
@@ -283,7 +294,7 @@ var game = {
 			localStorage.setItem("firstscore", this.getplayer().getmoney());
 		}
 		else{
-			if(localStorage.getItem("secondscore") < this.getplayer().getmoney())
+			if(localStorage.getItem("secondscore") < this.getplayer().getmoney() || localStorage.getItem("secondscore") == "null")
 			{
 				//pushesdown
 				localStorage.setItem("fifthname", localStorage.getItem("forthname"));
@@ -298,7 +309,7 @@ var game = {
 			}
 			else
 			{
-				if(localStorage.getItem("thirdscore") < this.getplayer().getmoney())
+				if(localStorage.getItem("thirdscore") < this.getplayer().getmoney() || localStorage.getItem("thirdscore") == "null")
 				{
 					//pushes down
 					localStorage.setItem("fifthname", localStorage.getItem("forthname"));
@@ -310,7 +321,7 @@ var game = {
 					localStorage.setItem("thirdscore", this.getplayer().getmoney());
 				}
 				else{
-					if(localStorage.getItem("forthscore") < this.getplayer().getmoney())
+					if(localStorage.getItem("forthscore") < this.getplayer().getmoney() || localStorage.getItem("forthscore") == "null")
 					{	//pushes down
 						localStorage.setItem("fifthname", localStorage.getItem("forthname"));
 						localStorage.setItem("fifthscore", localStorage.getItem("forthscore"));
@@ -319,7 +330,7 @@ var game = {
 						localStorage.setItem("forthscore", this.getplayer().getmoney());
 					}
 					else{
-						if(localStorage.getItem("fifthscore") < this.getplayer().getmoney())
+						if(localStorage.getItem("fifthscore") < this.getplayer().getmoney()  || localStorage.getItem("fifthscore") == "null")
 						{
 							localStorage.setItem("fifthname", name);
 							localStorage.setItem("fifthscore", this.getplayer().getmoney());
@@ -333,7 +344,10 @@ var game = {
 		}else{
 			alert("Unable to set highscore.");
 		}
+		
+		game.getui().menumaintrue();
 		location.reload();
+		
 	},
 	
 	getplayer: function(){

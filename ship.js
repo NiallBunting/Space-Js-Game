@@ -2,7 +2,7 @@ var ship = {
 	p_player:true,
 	p_direction: 0,
 	// power forward, back, left, right
-	p_power: [10 , -3, -0.01, 0.01],
+	p_power: [20 , -6, -0.01, 0.01],
 	p_spin: 0,
 	p_hpregenamount: 0.002,
 	p_hpregencumative: 0,
@@ -12,6 +12,7 @@ var ship = {
 	p_maxhp: 100,
 	p_hp: 100,
 	p_armour: 50,
+	p_invunrable: 160,
 	//Status: 0 fine, 9 destroyed
 	p_status: 0,
 	p_fuel: 2000,
@@ -21,13 +22,14 @@ var ship = {
 	create: function(){
 		var obj = Object.create(this);
 		 //12680000
-		obj.physical = particle.create("ship", 0, 17582000, 10, 10);
+		obj.physical = particle.create("ship", 10300, 9000000, 10, 10);
 		obj.weapon = weapon.create("machinegun", 50, 200, 500, 4000, 300, 20, 0.9);
 		obj.ship = obj;
 		return obj;
 	},
 	
 	update: function(time){
+		if(this.p_invunrable > 0){this.p_invunrable--;}
 		this.physical.update(time);
 		this.p_direction += (this.p_spin * time);
 		if(this.p_direction > Math.PI){this.p_direction = -Math.PI;}
@@ -150,9 +152,11 @@ var ship = {
 		this.p_status = 9;
 	},
 	
-	damage: function(damage){		
+	damage: function(damage){
+		if(this.p_invunrable > 0){return this.p_hp;}
+	
 		var armoureffect = Math.min(((Math.random() * (1/this.p_armourpower))  + ((this.p_armourpower - 1)/this.p_armourpower)) * this.p_armour, damage);
-
+		
 		this.p_armour -= armoureffect;
 		this.p_hp -= (damage - armoureffect);
 
