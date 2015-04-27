@@ -10,31 +10,39 @@ var shipai = {
 	p_previousangletoattack: 0,
 		
 	create: function(player){
-		var dist= 10000;
+		var dist= this.createdistance() * this.createdistance();
 		var obj = Object.create(this);
 		obj.ship = ship.create();
 		obj.physical = obj.ship.physical;
 		var targetposangle = Math.random() * 2 * Math.PI;
-		var targetx = player.physical.getx() + (dist * Math.cos(targetposangle));
-		var targety = player.physical.gety() + (dist * Math.sin(targetposangle));
-		obj.physical.setx(targetx);
-		obj.physical.sety(targety);
+		obj.ship.p_hp = 50;
+		obj.physical.setx((player.physical.p_x + (dist * Math.cos(targetposangle))));
+		obj.physical.sety((player.physical.p_y + (dist * Math.cos(targetposangle))));
+		obj.physical.p_px = (player.physical.p_px) + (dist * Math.cos(targetposangle));
+		obj.physical.p_py = (player.physical.p_py) + (dist * Math.cos(targetposangle));
 		obj.physical.p_mass = (Math.random() * 5) + 5;
 		obj.p_player = player;
+		obj.ship.weapon.p_power = 5;
 		obj.ship.p_direction = Math.random() * 2 * Math.PI;
-		obj.ship.p_fuel = 1000;
+		obj.ship.p_fuel = 5000;
 		obj.ship.p_player = false;
 		return obj;
 	},
 
+	createdistance:function(){
+		return (game.getplayer().physical.getspeed() / 6) + 100;
+	},
 	update: function(time){		
-		this.attack(this.p_player);
 
 		if(this.ship.getfuel() < 0){
 			
 			this.ship.destroy();
 		}		
-		return this.ship.update(time);
+		var shipval = this.ship.update(time);
+
+		this.attack(this.p_player);
+
+		return shipval;
 	},
 
 	draw: function() {
@@ -42,7 +50,11 @@ var shipai = {
 	},
 	
 	collided: function(obj){
-		this.ship.physical.collided(obj);
+		if(this.ship.physical.collided(obj)){
+			if(obj.gettype() == "planet"){
+				this.ship.damage(1);
+			}
+		}
 	},
 	
 	draw: function(){

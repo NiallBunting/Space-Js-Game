@@ -375,7 +375,7 @@ var ui = {
 			game.getcontext().fillText("Choose Section...",300,130);
 			}
 			if(this.p_buymenu == 1)		{	
-			this.createbutton(20,105,200,135,this.increasevalue,["fuel", 0, (game.getplayer().p_maxfuel - game.getplayer().p_fuel) / 10]);
+			this.createbutton(20,105,200,135,this.increasevalue,["fuel", 0, (game.getplayer().p_maxfuel - game.getplayer().p_fuel) / 100]);
 			this.createbutton(20,145,200,175,this.increasevalue,["armour", 0, (game.getplayer().p_maxarmour - game.getplayer().p_armour)/2]);
 			this.createbutton(20,185,200,215,this.increasevalue,["hp", 0, (game.getplayer().p_maxhp - game.getplayer().p_hp)]);
 			this.createbutton(20,225,200,255,this.increasevalue,["ammo", 50, 10]);
@@ -388,7 +388,7 @@ var ui = {
 			game.getcontext().fillText("Ammo",20,250);		
 			game.getcontext().fillText("Back",20,350);
 
-			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxfuel - game.getplayer().p_fuel) / 10 + " \u00A30.10 each",300,130);
+			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxfuel - game.getplayer().p_fuel) / 100 + " \u00A30.10 each",300,130);
 			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxarmour - game.getplayer().p_armour) / 2+ " \u00A30.50 each",300,170);
 			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxhp - game.getplayer().p_hp)+ " \u00A31.00 each",300,210);
 			game.getcontext().fillText("\u00A310 for 50",300,250);
@@ -492,11 +492,12 @@ var ui = {
 			game.getplayer().weapon.p_maxdistance += amount;
 			break;
 			case "buygoods":
-			game.getplayer().p_goodplanet = this.p_planetbuyingfrom;
+			if(game.getplayer().p_goods == 0){game.getplayer().p_goodplanet = game.getui().p_planetbuyingfrom;}
+			if(game.getui().p_planetbuyingfrom != game.getplayer().p_goodplanet){return;}
 			game.getplayer().p_goods += amount;
 			break;
 			case "sellgoods":
-			if(game.getplayer().p_goodplanet == this.p_planetbuyingfrom){return;}
+			if(game.getplayer().p_goodplanet == game.getui().p_planetbuyingfrom){return;}
 			game.getplayer().p_goods = 0;
 			break;
 		}
@@ -520,7 +521,7 @@ var minimap = {
 	
 	draw: function(){	
 		var size = 80;				
-		var scale = (game.getplayer().physical.getspeed() * 5) + 100;
+		var scale = (game.getplayer().physical.getspeed() / 6) + 100;
 		game.getcontext().scale(1/scale, 1/scale);
 		game.getcontext().fillStyle= "rgba(255, 255, 255, 0.5)";
 		game.getcontext().beginPath();

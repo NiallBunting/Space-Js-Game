@@ -2,7 +2,7 @@ var ship = {
 	p_player:true,
 	p_direction: 0,
 	// power forward, back, left, right
-	p_power: [20 , -6, -0.01, 0.01],
+	p_power: [100 , -30, -0.01, 0.01],
 	p_spin: 0,
 	p_hpregenamount: 0.002,
 	p_hpregencumative: 0,
@@ -18,8 +18,8 @@ var ship = {
 	p_invunrable: 160,
 	//Status: 0 fine, 9 destroyed
 	p_status: 0,
-	p_fuel: 2000,
-	p_maxfuel:2000,
+	p_fuel: 10000,
+	p_maxfuel:10000,
 	// One means completly random, any number higher adds a minimum
 	p_armourpower: 1,
 

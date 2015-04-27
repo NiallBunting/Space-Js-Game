@@ -67,16 +67,22 @@ var game = {
 		this.p_objects[this.p_objects.length] = ship.create();
 		this.p_player = this.p_objects[this.p_objects.length - 1];
 		
-		this.p_objects[this.p_objects.length] = planet.create(0, 0, 63000000000000, 160000, 'FFFF00', "Sun");		
-		this.p_objects[this.p_objects.length] = planet.create(4200000 * Math.cos(Math.random() * 2 * Math.PI), 4200000 * Math.sin(Math.random() * 2 * Math.PI), 370000000000, 74000, '787878', "Tars");
-		this.p_objects[this.p_objects.length] = planet.create(5400000 * Math.cos(Math.random() * 2 * Math.PI), 5400000 * Math.sin(Math.random() * 2 * Math.PI), 470000000000, 77000, 'CC0000', "Niallopia");
-		this.p_objects[this.p_objects.length] = planet.create(6600000 * Math.cos(Math.random() * 2 * Math.PI), 6600000 * Math.sin(Math.random() * 2 * Math.PI), 700000000000, 50000, 'CC3300', "Larth");
-		this.p_objects[this.p_objects.length] = planet.create(7800000 * Math.cos(Math.random() * 2 * Math.PI), 7700000 * Math.sin(Math.random() * 2 * Math.PI), 410000000000, 96000, '787878', "Vapper");	
-		this.p_objects[this.p_objects.length] = planet.create(9000000 * Math.cos(Math.random() * 2 * Math.PI), 9000000 * Math.sin(Math.random() * 2 * Math.PI), 520000000000, 52000, '00CC00', "Nabb");
-		var xpos = 10200000 * Math.cos(Math.random() * 2 * Math.PI);
-		var ypos = 10200000 * Math.sin(Math.random() * 2 * Math.PI);
+		this.p_objects[this.p_objects.length] = planet.create(0, 0, 63000000000000, 160000, 'FFFF00', "Sun");	
+		var rand = Math.random() * 2 * Math.PI;
+		this.p_objects[this.p_objects.length] = planet.create(5200000 * Math.cos(rand), 5200000 * Math.sin(rand), 370000000, 74000, '787878', "Tars");
+		var rand = Math.random() * 2 * Math.PI;
+		this.p_objects[this.p_objects.length] = planet.create(6000000 * Math.cos(rand), 6000000 * Math.sin(rand), 470000000, 77000, 'CC0000', "Niallopia");
+		var rand = Math.random() * 2 * Math.PI;
+		this.p_objects[this.p_objects.length] = planet.create(6400000 * Math.cos(rand), 6400000 * Math.sin(rand), 700000000, 50000, 'CC3300', "Larth");
+		var rand = Math.random() * 2 * Math.PI;
+		this.p_objects[this.p_objects.length] = planet.create(6880000 * Math.cos(rand), 6800000 * Math.sin(rand), 410000000, 96000, '787878', "Vapper");
+		var rand = Math.random() * 2 * Math.PI;	
+		this.p_objects[this.p_objects.length] = planet.create(7000000 * Math.cos(rand), 7000000 * Math.sin(rand), 240000000, 52000, '00CC00', "Nabb");
+		var rand = Math.random() * 2 * Math.PI;
+		var xpos = 6900000 * Math.cos(rand);
+		var ypos = 6900000 * Math.sin(rand);
 
-		this.p_objects[this.p_objects.length] = planet.create(xpos, ypos, 600000000, 43000, '0066FF', "TuTu");
+		this.p_objects[this.p_objects.length] = planet.create(xpos, ypos, 340000000, 43000, '0066FF', "TuTu");
 
 		this.p_player.physical.setx(xpos + 42990);
 
