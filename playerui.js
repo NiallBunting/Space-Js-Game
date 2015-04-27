@@ -427,8 +427,8 @@ var ui = {
 			game.getcontext().fillText("at another planet.",20,230);	
 			game.getcontext().fillText("Back",20,350);
 
-			game.getcontext().fillText("\u00A31.00 for 10"  ,300,130);
-			game.getcontext().fillText("\u00A31.50 for 10" ,300,170);
+			game.getcontext().fillText("\u00A310.00 for 10"  ,300,130);
+			game.getcontext().fillText("\u00A315.00 for 10" ,300,170);
 			game.getcontext().fillText("Goods: " + game.getplayer().p_goods,300,210);
 			}
 

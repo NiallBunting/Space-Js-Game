@@ -7,7 +7,7 @@ var ship = {
 	p_hpregenamount: 0.002,
 	p_hpregencumative: 0,
 	p_maxhpregen: 0.8,
-	p_money: 10,
+	p_money: 1000,
 	p_goods: 50,
 	p_goodplanet: 0,
 	
