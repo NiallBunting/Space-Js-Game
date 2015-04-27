@@ -279,7 +279,7 @@ var ui = {
 			game.getcontext().fillText("Spacegame!",20,50);
 			game.p_ctx.font='normal 20px Arial';
 			game.getcontext().fillText("Play",20,90);		
-			game.getcontext().fillText("About Page",20,130);	
+			game.getcontext().fillText("About Page <- Contains the instructions.",20,130);	
 			game.getcontext().fillText("GitHub",20,170);
 			game.getcontext().fillText("Sound Off/On",20,210);
 
@@ -291,7 +291,7 @@ var ui = {
 			game.getcontext().fillText("4. " + localStorage.getItem("forthname") + " \u00A3" + localStorage.getItem("forthscore"),game.getcanvas().width - 305,170);	
 			game.getcontext().fillText("5. " + localStorage.getItem("fifthname") + " \u00A3" + localStorage.getItem("fifthscore"),game.getcanvas().width - 305,190);
 			} else {
-			game.getcontext().fillText("You don't support storage.",game.getcanvas().width - 305,90);
+			
 			}
 	
 	},
@@ -375,7 +375,7 @@ var ui = {
 			game.getcontext().fillText("Choose Section...",300,130);
 			}
 			if(this.p_buymenu == 1)		{	
-			this.createbutton(20,105,200,135,this.increasevalue,["fuel", 0, (game.getplayer().p_maxfuel - game.getplayer().p_fuel) / 100]);
+			this.createbutton(20,105,200,135,this.increasevalue,["fuel", 0, (game.getplayer().p_maxfuel - game.getplayer().p_fuel) / 50]);
 			this.createbutton(20,145,200,175,this.increasevalue,["armour", 0, (game.getplayer().p_maxarmour - game.getplayer().p_armour)/2]);
 			this.createbutton(20,185,200,215,this.increasevalue,["hp", 0, (game.getplayer().p_maxhp - game.getplayer().p_hp)]);
 			this.createbutton(20,225,200,255,this.increasevalue,["ammo", 50, 10]);
@@ -388,7 +388,7 @@ var ui = {
 			game.getcontext().fillText("Ammo",20,250);		
 			game.getcontext().fillText("Back",20,350);
 
-			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxfuel - game.getplayer().p_fuel) / 100 + " \u00A30.10 each",300,130);
+			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxfuel - game.getplayer().p_fuel) / 50 + " \u00A30.02 each",300,130);
 			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxarmour - game.getplayer().p_armour) / 2+ " \u00A30.50 each",300,170);
 			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxhp - game.getplayer().p_hp)+ " \u00A31.00 each",300,210);
 			game.getcontext().fillText("\u00A310 for 50",300,250);
