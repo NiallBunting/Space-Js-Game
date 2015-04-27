@@ -239,7 +239,7 @@ var ui = {
 			//buttontomenu
 			this.createbutton(game.getcanvas().width - 115,4, game.getcanvas().width - 15, 21,this.menumaintrue,0);
 		}
-
+		
 		//Checks if near the edge of the screen, to scroll
 		if(this.p_mousemove){
 			if(this.p_mouseposition.x > game.getcanvas().width - (game.getcanvas().width * 0.1)){this.p_mapoffset[0] -= (5 * this.p_mapfactor);}
@@ -328,12 +328,14 @@ var ui = {
 				game.getcontext().fillText("Menu.",game.getcanvas().width - 115,20);
 				if(!this.p_drawbuymenu){this.minimap.draw();}
 			}
+
 			if(this.p_displayopen){
 				this.showmap();
 			}
-
-			if(this.p_drawbuymenu > 0){
-				this.showbuymenu();
+			else{
+				if(this.p_drawbuymenu > 0){
+					this.showbuymenu();
+				}
 			}
 		}
 
@@ -350,6 +352,8 @@ var ui = {
 
 	showbuymenu: function(){
 			this.p_buttons = [];
+			this.createbutton(game.getcanvas().width - 115,4, game.getcanvas().width - 15, 21,this.menumaintrue,0);
+
 			game.getcontext().fillStyle = 'rgba(200, 200, 200, 0.8)';
 			game.getcontext().fillRect(20, 110, 200, 300);
 			game.getcontext().fillRect(300, 110, 200, 300);
