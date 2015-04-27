@@ -11,6 +11,9 @@ var ui = {
 	p_mouseposition: 0,
 	p_planetover: 0,
 	p_mainmenu:true,
+	p_drawbuymenu: 0,
+	p_planetbuyingfrom: false,
+	p_buymenu:0,
 	
 	create: function(){
 		var obj = Object.create(this);
@@ -28,7 +31,6 @@ var ui = {
 			if (click.x < this.p_buttons[i][0]) continue;
 			if (click.y > this.p_buttons[i][3]) continue;
 			if (click.y < this.p_buttons[i][1]) continue;
-
 			this.p_buttons[i][4](this.p_buttons[i][5]);
 		}
 	},
@@ -219,17 +221,25 @@ var ui = {
 			}
 		}
 	},
+
+	onplanet: function(obj, draw){
+		if(draw){this.p_drawbuymenu = 30;}
+		this.p_planetbuyingfrom = obj;
+
+	},
+	
 	
 	isdisplayopen: function(){
 		this.p_displayopen;
 	},
 	
 	update: function(){
-		if(!this.p_mapopen){
+		if(!this.p_mapopen && !this.p_drawbuymenu){
 		this.p_buttons = [];
 			//buttontomenu
 			this.createbutton(game.getcanvas().width - 115,4, game.getcanvas().width - 15, 21,this.menumaintrue,0);
 		}
+
 		//Checks if near the edge of the screen, to scroll
 		if(this.p_mousemove){
 			if(this.p_mouseposition.x > game.getcanvas().width - (game.getcanvas().width * 0.1)){this.p_mapoffset[0] -= (5 * this.p_mapfactor);}
@@ -246,6 +256,10 @@ var ui = {
 			if (this.p_mouseposition.y < this.p_hover[i][1]) continue;
 
 			this.p_hover[i][4](this.p_hover[i][5]);
+		}
+
+		if(this.p_drawbuymenu > 0){
+			this.p_drawbuymenu--;
 		}
 	},
 
@@ -305,19 +319,24 @@ var ui = {
 				game.getcontext().fillStyle= '#bbb';
 				game.getcontext().fillRect(game.getcanvas().width - 115, 25, 100, -21);
 				game.getcontext().fillStyle= '#0f0';
-				game.getcontext().fillText("Hp: "+ Math.ceil(game.getplayer().gethp()) + " Armour: " + Math.ceil(game.getplayer().getarmour()) ,10,20);
-				game.getcontext().fillText("Cosmic Speed: " + Math.ceil(game.getplayer().physical.getspeed()) + " Fuel: " + Math.ceil(game.getplayer().getfuel()),10,40);
+				game.getcontext().fillText("Hp: "+ Math.ceil(game.getplayer().gethp()) + "/" + Math.ceil(game.getplayer().p_maxhp) + " Armour: " + Math.ceil(game.getplayer().getarmour())  + "/" + Math.ceil(game.getplayer().p_maxarmour),10,20);
+				game.getcontext().fillText("Cosmic Speed: " + Math.ceil(game.getplayer().physical.getspeed()) + " Fuel: " + Math.ceil(game.getplayer().getfuel()) + "/" + Math.ceil(game.getplayer().p_maxfuel),10,40);
 				game.getcontext().fillText("\u00A3" + Math.round(game.getplayer().getmoney()),10,60);
 				game.getcontext().fillText(game.getplayer().weapon.gettype(),10,80);
 				game.getcontext().fillText(game.getplayer().weapon.getammo(),10,100);
 				game.getcontext().fillStyle= '#000';
 				game.getcontext().fillText("Menu.",game.getcanvas().width - 115,20);
-			
-				this.minimap.draw();
-			}else{
+				if(!this.p_drawbuymenu){this.minimap.draw();}
+			}
+			if(this.p_displayopen){
 				this.showmap();
 			}
+
+			if(this.p_drawbuymenu > 0){
+				this.showbuymenu();
+			}
 		}
+
 
 	},
 
@@ -327,6 +346,158 @@ var ui = {
 
 	mainmenuclose: function(){
 		game.getui().p_mainmenu = false;
+	},
+
+	showbuymenu: function(){
+			this.p_buttons = [];
+			game.getcontext().fillStyle = 'rgba(200, 200, 200, 0.8)';
+			game.getcontext().fillRect(20, 110, 200, 300);
+			game.getcontext().fillRect(300, 110, 200, 300);
+			this.createbutton(20,330,200,350,this.changebuymenupage,0);
+
+			if(this.p_buymenu == 0)		{	
+			this.createbutton(20,105,200,135,this.changebuymenupage,1);
+			this.createbutton(20,145,200,175,this.changebuymenupage,2);
+			this.createbutton(20,185,200,215,this.changebuymenupage,3);
+			this.createbutton(20,225,200,255,this.changebuymenupage,4);
+
+			game.getcontext().fillStyle = '#000';	
+			game.p_ctx.font='normal 20px Arial';
+			game.getcontext().fillText("Ship",20,130);		
+			game.getcontext().fillText("Upgrades",20,170);	
+			game.getcontext().fillText("Cargo",20,210);
+			game.getcontext().fillText("Weapon",20,250);
+
+			game.getcontext().fillText("Choose Section...",300,130);
+			}
+			if(this.p_buymenu == 1)		{	
+			this.createbutton(20,105,200,135,this.increasevalue,["fuel", 0, (game.getplayer().p_maxfuel - game.getplayer().p_fuel) / 10]);
+			this.createbutton(20,145,200,175,this.increasevalue,["armour", 0, (game.getplayer().p_maxarmour - game.getplayer().p_armour)/2]);
+			this.createbutton(20,185,200,215,this.increasevalue,["hp", 0, (game.getplayer().p_maxhp - game.getplayer().p_hp)]);
+			this.createbutton(20,225,200,255,this.increasevalue,["ammo", 50, 10]);
+
+			game.getcontext().fillStyle = '#000';	
+			game.p_ctx.font='normal 20px Arial';
+			game.getcontext().fillText("Buy Fuel",20,130);			
+			game.getcontext().fillText("Buy Armour",20,170);		
+			game.getcontext().fillText("Repair Hp",20,210);	
+			game.getcontext().fillText("Ammo",20,250);		
+			game.getcontext().fillText("Back",20,350);
+
+			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxfuel - game.getplayer().p_fuel) / 10 + " \u00A30.10 each",300,130);
+			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxarmour - game.getplayer().p_armour) / 2+ " \u00A30.50 each",300,170);
+			game.getcontext().fillText("\u00A3" + (game.getplayer().p_maxhp - game.getplayer().p_hp)+ " \u00A31.00 each",300,210);
+			game.getcontext().fillText("\u00A310 for 50",300,250);
+			}
+			if(this.p_buymenu == 2)		{	
+			this.createbutton(20,105,200,135,this.increasevalue,["maxarmour", 25, 100]);
+			this.createbutton(20,145,200,175,this.increasevalue,["maxfuel", 100, 100]);
+			this.createbutton(20,185,200,215,this.increasevalue,["forward", 1, 100]);
+			this.createbutton(20,225,200,255,this.increasevalue,["back", 0.5, 100]);
+			this.createbutton(20,265,200,295,this.increasevalue,["side", 0.01, 100]);
+
+			game.getcontext().fillStyle = '#000';	
+			game.p_ctx.font='normal 20px Arial';
+			game.getcontext().fillText("Upgrade Armour",20,130);		
+			game.getcontext().fillText("Upgrade Fuel",20,170);	
+			game.getcontext().fillText("Forward Power",20,210);
+			game.getcontext().fillText("Back Power",20,250);
+			game.getcontext().fillText("Side Power",20,290);
+			game.getcontext().fillText("Back",20,350);
+
+			game.getcontext().fillText("\u00A3100 for 25"  ,300,130);
+			game.getcontext().fillText("\u00A3100 for 100" ,300,170);
+			game.getcontext().fillText("\u00A3100 for 1 power" ,300,210);
+			game.getcontext().fillText("\u00A3100 for .5 power" ,300,250);
+			game.getcontext().fillText("\u00A3100 for .01" ,300,290);
+			}
+			if(this.p_buymenu == 3)		{	
+			this.createbutton(20,105,200,135,this.increasevalue,["buygoods",10, 10]);
+			this.createbutton(20,145,200,175,this.increasevalue,["sellgoods",game.getplayer().p_goods, (-1.50*game.getplayer().p_goods)]);
+
+			game.getcontext().fillStyle = '#000';	
+			game.p_ctx.font='normal 20px Arial';
+			game.getcontext().fillText("Buy Goods",20,130);		
+			game.getcontext().fillText("Sell Goods",20,170);
+			game.getcontext().fillText("Have to trade",20,210);
+			game.getcontext().fillText("at another planet.",20,230);	
+			game.getcontext().fillText("Back",20,350);
+
+			game.getcontext().fillText("\u00A31.00 for 10"  ,300,130);
+			game.getcontext().fillText("\u00A31.50 for 10" ,300,170);
+			game.getcontext().fillText("Goods: " + game.getplayer().p_goods,300,210);
+			}
+
+			if(this.p_buymenu == 4)		{	
+			this.createbutton(20,105,200,135,this.increasevalue,["wdistance", 10, 100]);
+			this.createbutton(20,145,200,175,this.increasevalue,["wdamage", 1, 100]);
+
+			game.getcontext().fillStyle = '#000';	
+			game.p_ctx.font='normal 20px Arial';
+			game.getcontext().fillText("Distance Increase",20,130);		
+			game.getcontext().fillText("Damage Increase",20,170);	
+			game.getcontext().fillText("Back",20,350);
+
+			game.getcontext().fillText("\u00A3100 for 10 distance"  ,300,130);
+			game.getcontext().fillText("\u00A3100 for 1 power" ,300,170);
+			}
+	},
+
+	changebuymenupage:function(val){
+		game.getui().p_buymenu = val;
+	},
+
+	increasevalue:function(data){
+		var amount = data[1];
+		var cost = data[2];
+		if((game.getplayer().p_money - cost) < 0){return;}
+
+		switch(data[0]){
+			case "maxarmour":
+			game.getplayer().p_maxarmour += amount;
+			break;
+			case "maxfuel":
+			game.getplayer().p_maxfuel += amount;
+			break;
+			case "forward":
+			game.getplayer().p_power[0] += amount;
+			break;
+			case "backward":
+			game.getplayer().p_power[1] -= amount;
+			break;
+			case "side":
+			game.getplayer().p_power[2] -= amount;
+			game.getplayer().p_power[3] += amount;
+			break;
+			case "fuel":
+			game.getplayer().p_fuel = game.getplayer().p_maxfuel;
+			break;
+			case "armour":
+			game.getplayer().p_armour = game.getplayer().p_maxarmour;
+			break;
+			case "hp":
+			game.getplayer().p_hp = game.getplayer().p_maxhp;
+			break;
+			case "ammo":
+			game.getplayer().weapon.p_currentammo += amount;
+			break;
+			case "wdamage":
+			game.getplayer().weapon.p_power += amount;
+			break;
+			case "wdistance":
+			game.getplayer().weapon.p_maxdistance += amount;
+			break;
+			case "buygoods":
+			game.getplayer().p_goodplanet = this.p_planetbuyingfrom;
+			game.getplayer().p_goods += amount;
+			break;
+			case "sellgoods":
+			if(game.getplayer().p_goodplanet == this.p_planetbuyingfrom){return;}
+			game.getplayer().p_goods = 0;
+			break;
+		}
+
+		game.getplayer().addmoney(-cost);
 	}
 	
 };

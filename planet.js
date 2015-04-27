@@ -50,8 +50,8 @@ var planet = {
 		var dist = calculate_distance(this.physical.getx() , this.p_orbit_object.physical.getx(), this.physical.gety(), this.p_orbit_object.physical.gety());
 	
 		// NEEDS TO WORK OUT ANGLE IT IS AND THEN THE DISTANCE FROM ITS PROPPER POSITION
-		var allowance = 0.00000000001;
-		var power = 1000000000;
+		var allowance = 0.01;
+		var power = 100000000;
 		if(dist < this.p_orbit_dist - (allowance * this.p_orbit_dist)){
 
 			var direction = Math.atan2(this.physical.getx() - this.p_orbit_object.physical.getx(), this.physical.gety() - this.p_orbit_object.physical.gety());
@@ -65,9 +65,12 @@ var planet = {
 	},
 
 	collided: function(obj){
-		if(this.physical.collided(obj) && obj == game.getplayer()){
-			console.log("oaeuou");
+		if(this.physical.collided(obj)){
+			if(obj === game.getplayer().physical){
+				game.getui().onplanet(this, true);
+			}
 		}
+
 	},
 
 	getname: function(){

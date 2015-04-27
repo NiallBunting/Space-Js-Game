@@ -68,22 +68,24 @@ var game = {
 		this.p_player = this.p_objects[this.p_objects.length - 1];
 		
 		this.p_objects[this.p_objects.length] = planet.create(0, 0, 63000000000000, 160000, 'FFFF00', "Sun");		
-		this.p_objects[this.p_objects.length] = planet.create(4200000 * Math.cos(Math.random() * 2 * Math.PI), 4200000 * Math.sin(Math.random() * 2 * Math.PI), 3700000000, 74000, '787878', "Tars");
-		this.p_objects[this.p_objects.length] = planet.create(5400000 * Math.cos(Math.random() * 2 * Math.PI), 5400000 * Math.sin(Math.random() * 2 * Math.PI), 4700000000, 77000, 'CC0000', "Niallopia");
-		this.p_objects[this.p_objects.length] = planet.create(6600000 * Math.cos(Math.random() * 2 * Math.PI), 6600000 * Math.sin(Math.random() * 2 * Math.PI), 7000000000, 50000, 'CC3300', "Larth");
-		this.p_objects[this.p_objects.length] = planet.create(7800000 * Math.cos(Math.random() * 2 * Math.PI), 7700000 * Math.sin(Math.random() * 2 * Math.PI), 4100000000, 96000, '787878', "Vapper");	
-		this.p_objects[this.p_objects.length] = planet.create(9000000 * Math.cos(Math.random() * 2 * Math.PI), 9000000 * Math.sin(Math.random() * 2 * Math.PI), 1200000000, 52000, '00CC00', "Nabb");
+		this.p_objects[this.p_objects.length] = planet.create(4200000 * Math.cos(Math.random() * 2 * Math.PI), 4200000 * Math.sin(Math.random() * 2 * Math.PI), 370000000000, 74000, '787878', "Tars");
+		this.p_objects[this.p_objects.length] = planet.create(5400000 * Math.cos(Math.random() * 2 * Math.PI), 5400000 * Math.sin(Math.random() * 2 * Math.PI), 470000000000, 77000, 'CC0000', "Niallopia");
+		this.p_objects[this.p_objects.length] = planet.create(6600000 * Math.cos(Math.random() * 2 * Math.PI), 6600000 * Math.sin(Math.random() * 2 * Math.PI), 700000000000, 50000, 'CC3300', "Larth");
+		this.p_objects[this.p_objects.length] = planet.create(7800000 * Math.cos(Math.random() * 2 * Math.PI), 7700000 * Math.sin(Math.random() * 2 * Math.PI), 410000000000, 96000, '787878', "Vapper");	
+		this.p_objects[this.p_objects.length] = planet.create(9000000 * Math.cos(Math.random() * 2 * Math.PI), 9000000 * Math.sin(Math.random() * 2 * Math.PI), 520000000000, 52000, '00CC00', "Nabb");
 		var xpos = 10200000 * Math.cos(Math.random() * 2 * Math.PI);
 		var ypos = 10200000 * Math.sin(Math.random() * 2 * Math.PI);
 
 		this.p_objects[this.p_objects.length] = planet.create(xpos, ypos, 600000000, 43000, '0066FF', "TuTu");
+
 		this.p_player.physical.setx(xpos + 42990);
+
 		this.p_player.physical.sety(ypos);
 		for(var i = 2; i < this.p_objects.length; i++) {
 			this.p_objects[i].orbit(this.p_objects[1]);
 		}
 		
-		this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
+		
 	},
 	
 	//The game loop
@@ -130,7 +132,7 @@ var game = {
 		}
 
 		//possibly adds ai
-		if(Math.random() < 0.003){
+		if(Math.random() < 0.003 && this.p_objects.length < 30){
 			this.p_objects[this.p_objects.length] = shipai.create(this.p_player);
 		}
 		
@@ -271,7 +273,7 @@ var game = {
 	getgravity: function(){
 		return this.p_gamegrav;
 	},
-	
+
 	playerkilled: function(){
 		game.audio.yourdead.play();
 		if(typeof(Storage) !== "undefined") {

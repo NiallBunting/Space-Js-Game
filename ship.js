@@ -8,14 +8,18 @@ var ship = {
 	p_hpregencumative: 0,
 	p_maxhpregen: 0.8,
 	p_money: 10,
+	p_goods: 50,
+	p_goodplanet: 0,
 	
 	p_maxhp: 100,
 	p_hp: 100,
 	p_armour: 50,
+	p_maxarmour: 50,
 	p_invunrable: 160,
 	//Status: 0 fine, 9 destroyed
 	p_status: 0,
 	p_fuel: 2000,
+	p_maxfuel:2000,
 	// One means completly random, any number higher adds a minimum
 	p_armourpower: 1,
 
